@@ -1,9 +1,15 @@
-import express from "express";
-const app = express();
+import express, {Express, Request, Response} from "express";
+import dotenv from 'dotenv';
+
+const app: Express = express();
+const port = process.env.PORT || 3000;
 
 
-app.get("/", function (req, res) {
+app.get("/", (req: Request, res: Response) => {
         res.send("Hello world");
 });
 
-app.listen(3000);
+
+app.listen(port, () => {
+        console.log(`⚡️[server]: Server running at http://localhost:${port}`);
+});
