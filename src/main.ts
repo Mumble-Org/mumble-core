@@ -1,10 +1,9 @@
-function sayMyName(name: string): void {
-        if (name == "Heisenberg") {
-                console.log("You're right ");
-        } else {
-                console.log("You're wrong");
-        }
-}
+import express from "express";
+const app = express();
 
 
-sayMyName("Heisenberg");
+app.get("/", function (req, res) {
+        res.send("Hello world");
+});
+
+app.listen(3000);
