@@ -3,6 +3,8 @@ import { getErrorMessage } from '../utils/errors.util';
 import * as userServices from '../services/user.service';
 // import { CustomRequest } from '../middleware/auth';
 
+
+// handles user's signin
 export const login = async (req: Request, res: Response) => {
         try {
                 const user = await userServices.login(req.body);
@@ -12,6 +14,7 @@ export const login = async (req: Request, res: Response) => {
         }
 };
 
+// handles users signup
 export const signup = async (req: Request, res: Response) => {
         try {
                 const newUser = req.body;

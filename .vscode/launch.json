@@ -21,8 +21,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/johnrumide/dev/mumble-core",
-      "program": "/home/johnrumide/dev/mumble-core/build/Debug/outDebug",
+      "cwd": "/home/johnrumide/dev/mumble-core/src",
+      "program": "/home/johnrumide/dev/mumble-core/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
