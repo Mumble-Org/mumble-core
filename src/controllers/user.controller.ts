@@ -23,3 +23,14 @@ export const signup = async (req: Request, res: Response) => {
                 return res.status(500).send(getErrorMessage(error));
         }
 };
+
+
+// Confirms username input doesn't exist in the database
+export const confirmUsername = async (req: Request, res: Response) => {
+        try {
+                const user = req.body.name;
+                await userServices.checkName(user);
+        } catch (error) {
+                return res.status(500).send(getErrorMessage(error));
+        }
+};

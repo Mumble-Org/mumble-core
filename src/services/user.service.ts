@@ -17,3 +17,11 @@ export async function login(user: HydratedDocument<I_UserDocument>) {
                 throw error;
         }
 }
+
+export async function checkName(user: HydratedDocument<I_UserDocument>) {
+        try {
+                const userFound = await UserModel.findOne({ name: user.name});
+        } catch (error) {
+                throw error;
+        }
+}
