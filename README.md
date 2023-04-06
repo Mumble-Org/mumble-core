@@ -15,6 +15,8 @@
 
 Server is currently in development
 
+Live deployment [here]("mumble-core-lsa73vgft-mumble-team.vercel.app")
+
 ## Technologies
 
 - Node.js - v19.0.0

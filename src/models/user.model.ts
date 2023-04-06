@@ -13,6 +13,7 @@ export interface I_UserDocument extends mongoose.Document {
         type: string;
 }
 
+// model schema definition
 const UserSchema: mongoose.Schema<I_UserDocument> = new mongoose.Schema({
         name: {
                 type: String,
@@ -53,8 +54,10 @@ const UserSchema: mongoose.Schema<I_UserDocument> = new mongoose.Schema({
         { timestamps: true }
 );
 
+// bcrypt salt rounds
 const saltRounds = 8;
 
+// mongoose middleware to alter password before saving
 UserSchema.pre('save', async function (next) {
         const user = this;
         if (user.isModified('password')) {
@@ -63,6 +66,8 @@ UserSchema.pre('save', async function (next) {
         next();
 });
 
+
+// create model
 const UserModel = mongoose.model<I_UserDocument>('User', UserSchema);
 
 export default UserModel;

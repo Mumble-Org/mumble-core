@@ -34,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 // routers
 app.use('/', UserRouter);
 
+// Start serve3r on port {port}
 app.listen(port, () => {
         console.log(`⚡️[server]: Server running at http://localhost:${port}`);
 });
