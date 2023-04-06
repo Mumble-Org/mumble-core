@@ -3,7 +3,7 @@ import { getErrorMessage } from './utils/errors.util';
 
 
 // mongodb connection string
-const mongo_uri: string = process.env.MONGO_URI;
+const mongo_uri = process.env.MONGO_URI;
 
 /* Database Connection */
 mongoose.connect(mongo_uri).then(() => {
