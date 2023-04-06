@@ -55,4 +55,5 @@ UserSchema.pre('save', async function (next) {
 });
 // create model
 const UserModel = mongoose_1.default.model('User', UserSchema);
+// export userModels
 exports.default = UserModel;

@@ -33,3 +33,4 @@ app.use('/', user_routes_1.default);
 app.listen(port, () => {
     console.log(`⚡️[server]: Server running at http://localhost:${port}`);
 });
+exports.default = app;
