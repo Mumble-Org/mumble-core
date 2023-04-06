@@ -70,4 +70,5 @@ UserSchema.pre('save', async function (next) {
 // create model
 const UserModel = mongoose.model<I_UserDocument>('User', UserSchema);
 
+// export userModels
 export default UserModel;
