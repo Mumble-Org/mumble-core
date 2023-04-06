@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import { getErrorMessage } from './utils/errors.util';
+import dotenv from 'dotenv'
 
 
 // mongodb connection string
-const mongo_uri = process.env.MONGO_URI;
+const url = process.env.MONGO_URI
+const mongo_uri = `${url}`;
 
 /* Database Connection */
 mongoose.connect(mongo_uri).then(() => {
