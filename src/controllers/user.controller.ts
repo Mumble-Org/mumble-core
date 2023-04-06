@@ -8,6 +8,7 @@ import * as userServices from '../services/user.service';
 export const login = async (req: Request, res: Response) => {
         try {
                 const user = await userServices.login(req.body);
+                res.cookie('Authorization', user.token);
                 res.status(200).send(user);
         } catch (error) {
                 return res.status(500).send(getErrorMessage(error));
@@ -19,6 +20,7 @@ export const signup = async (req: Request, res: Response) => {
         try {
                 const newUser = req.body;
                 await userServices.register(newUser);
+                res.status(201).send('User created!');
         } catch (error) {
                 return res.status(500).send(getErrorMessage(error));
         }
@@ -28,8 +30,9 @@ export const signup = async (req: Request, res: Response) => {
 // Confirms username input doesn't exist in the database
 export const confirmUsername = async (req: Request, res: Response) => {
         try {
-                const user = req.body.name;
-                await userServices.checkName(user);
+                const user = req.body;
+                const result = await userServices.checkName(user);
+                return res.status(200).send(result);
         } catch (error) {
                 return res.status(500).send(getErrorMessage(error));
         }

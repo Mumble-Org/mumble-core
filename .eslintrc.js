@@ -11,6 +11,7 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'import/prefer-default-export': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn'
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-this-alias': 0
   }
 };
