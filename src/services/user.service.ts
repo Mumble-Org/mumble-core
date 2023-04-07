@@ -79,9 +79,9 @@ export async function checkName(user: HydratedDocument<I_UserDocument>) {
 			name: user.name.toLowerCase(),
 		});
 		if (userFound) {
-			return { value: "true", message: "User already exists!" };
+			return { value: true, message: "User already exists!" };
 		} else {
-			return { value: "false", message: "Username is available!" };
+			return { value: false, message: "Username is available!" };
 		}
 	} catch (error) {
 		throw error;
@@ -94,9 +94,9 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 			email: user.email.toLowerCase(),
 		});
 		if (userFound) {
-			return { value: "true", message: "Email already exists!" };
+			return { value: true, message: "Email already exists!" };
 		} else {
-			return { value: "false", message: "Email is available!" };
+			return { value: false, message: "Email is available!" };
 		}
 	} catch (error) {
 		throw error;
