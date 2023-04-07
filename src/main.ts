@@ -9,6 +9,7 @@ import './db';
 // import routers
 import UserRouter from './routes/user.routes';
 
+dotenv.config();
 
 // initialize Express app
 const app: Express = express();

@@ -23,16 +23,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmUsername = exports.signup = exports.login = void 0;
+exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
 const errors_util_1 = require("../utils/errors.util");
 const userServices = __importStar(require("../services/user.service"));
-// import { CustomRequest } from '../middleware/auth';
-// handles user's signin
+/**
+ * Logs in a user
+ */
 const login = async (req, res) => {
     try {
         const user = await userServices.login(req.body);
-        res.cookie('Authorization', `Bearer ${user.token}`);
-        res.set('Authorization', `Bearer ${user.token}`);
+        res.cookie("Authorization", `Bearer ${user.token}`);
+        res.set("Authorization", `Bearer ${user.token}`);
         res.status(200).json(user);
     }
     catch (error) {
@@ -40,12 +41,15 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
-// handles users signup
+/**
+ * Signs up a user
+ */
 const signup = async (req, res) => {
     try {
-        const token = await userServices.register(req.body);
-        res.cookie('Authorization', `Bearer ${token?.token}`);
-        res.set('Authorization', `Bearer ${token?.token}`);
+        const body = await userServices.parseUser(req.body);
+        const token = await userServices.register(body);
+        res.cookie("Authorization", `Bearer ${token?.token}`);
+        res.set("Authorization", `Bearer ${token?.token}`);
         res.status(201).json(token);
     }
     catch (error) {
@@ -53,7 +57,9 @@ const signup = async (req, res) => {
     }
 };
 exports.signup = signup;
-// Confirms username input doesn't exist in the database
+/**
+ * Confirms username input doesn't exist in the database
+ */
 const confirmUsername = async (req, res) => {
     try {
         const user = req.body;
@@ -65,3 +71,17 @@ const confirmUsername = async (req, res) => {
     }
 };
 exports.confirmUsername = confirmUsername;
+/**
+ * Confirms email input doesn't exist in the database
+ */
+const confirmEmail = async (req, res) => {
+    try {
+        const user = req.body;
+        const result = await userServices.checkEmail(user);
+        return res.status(200).send(result);
+    }
+    catch (error) {
+        return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
+    }
+};
+exports.confirmEmail = confirmEmail;

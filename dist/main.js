@@ -7,10 +7,12 @@ const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const helmet_1 = __importDefault(require("helmet"));
+const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 require("./db");
 // import routers
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
+dotenv_1.default.config();
 // initialize Express app
 const app = (0, express_1.default)();
 // Declare server port

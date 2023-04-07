@@ -30,4 +30,5 @@ const router = (0, express_1.Router)();
 router.post('/login', userController.login);
 router.post('/signup', userController.signup);
 router.post('/confirmUser', userController.confirmUsername);
+router.post('/confirmEmail', userController.confirmEmail);
 exports.default = router;

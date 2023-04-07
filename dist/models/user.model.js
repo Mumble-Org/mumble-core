@@ -5,12 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-// model schema definition
+/**
+ * User model schema
+ */
 const UserSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
         unique: true,
-        required: true
+        required: true,
     },
     password: {
         type: String,
@@ -20,40 +22,44 @@ const UserSchema = new mongoose_1.default.Schema({
     email: {
         type: String,
         unique: true,
-        required: true
+        required: true,
     },
     calendar: {
-        type: String
+        type: String,
     },
-    genres: [{
+    genres: [
+        {
             type: String,
-        }],
+        },
+    ],
     location: {
-        type: String
+        type: String,
     },
     phone_number: {
-        type: String
+        type: String,
     },
-    portfolio: [{
-            type: String
-        }],
+    portfolio: [
+        {
+            type: String,
+        },
+    ],
     type: {
         type: String,
         enum: ["producer", "artist", "engineer"],
-        default: "producer"
+        default: "producer",
     },
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;
 // mongoose middleware to alter password before saving
-UserSchema.pre('save', async function (next) {
+UserSchema.pre("save", async function (next) {
     const user = this;
-    if (user.isModified('password')) {
+    if (user.isModified("password")) {
         user.password = await bcrypt_1.default.hash(user.password, saltRounds);
     }
     next();
 });
 // create model/home/johnrumide/dev/mumble-core/src/services
-const UserModel = mongoose_1.default.model('User', UserSchema);
+const UserModel = mongoose_1.default.model("User", UserSchema);
 // export userModels
 exports.default = UserModel;

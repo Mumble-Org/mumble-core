@@ -1,41 +1,58 @@
-import { Request, Response } from 'express';
-import { getErrorMessage } from '../utils/errors.util';
-import * as userServices from '../services/user.service';
-// import { CustomRequest } from '../middleware/auth';
+import { Request, Response } from "express";
+import { getErrorMessage } from "../utils/errors.util";
+import * as userServices from "../services/user.service";
 
-
-// handles user's signin
+/**
+ * Logs in a user
+ */
 export const login = async (req: Request, res: Response) => {
-        try {
-                const user = await userServices.login(req.body);
-                res.cookie('Authorization', `Bearer ${user.token}`);
-                res.set('Authorization', `Bearer ${user.token}`);
-                res.status(200).json(user);
-        } catch (error) {
-                return res.status(500).send(getErrorMessage(error));
-        }
+	try {
+		const user = await userServices.login(req.body);
+		res.cookie("Authorization", `Bearer ${user.token}`);
+		res.set("Authorization", `Bearer ${user.token}`);
+		res.status(200).json(user);
+	} catch (error) {
+		return res.status(500).send(getErrorMessage(error));
+	}
 };
 
-// handles users signup
+/**
+ * Signs up a user
+ */
 export const signup = async (req: Request, res: Response) => {
-        try {
-                const token = await userServices.register(req.body);
-                res.cookie('Authorization', `Bearer ${token?.token}`);
-                res.set('Authorization', `Bearer ${token?.token}`);
-                res.status(201).json(token);
-        } catch (error) {
-                return res.status(500).send(getErrorMessage(error));
-        }
+	try {
+		const body = await userServices.parseUser(req.body);
+		const token = await userServices.register(body);
+		res.cookie("Authorization", `Bearer ${token?.token}`);
+		res.set("Authorization", `Bearer ${token?.token}`);
+		res.status(201).json(token);
+	} catch (error) {
+		return res.status(500).send(getErrorMessage(error));
+	}
 };
 
-
-// Confirms username input doesn't exist in the database
+/**
+ * Confirms username input doesn't exist in the database
+ */
 export const confirmUsername = async (req: Request, res: Response) => {
-        try {
-                const user = req.body;
-                const result = await userServices.checkName(user);
-                return res.status(200).send(result);
-        } catch (error) {
-                return res.status(500).send(getErrorMessage(error));
-        }
+	try {
+		const user = req.body;
+		const result = await userServices.checkName(user);
+		return res.status(200).send(result);
+	} catch (error) {
+		return res.status(500).send(getErrorMessage(error));
+	}
+};
+
+/**
+ * Confirms email input doesn't exist in the database
+ */
+export const confirmEmail = async (req: Request, res: Response) => {
+	try {
+		const user = req.body;
+		const result = await userServices.checkEmail(user);
+		return res.status(200).send(result);
+	} catch (error) {
+		return res.status(500).send(getErrorMessage(error));
+	}
 };
