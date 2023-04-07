@@ -53,7 +53,7 @@ UserSchema.pre('save', async function (next) {
     }
     next();
 });
-// create model
+// create model/home/johnrumide/dev/mumble-core/src/services
 const UserModel = mongoose_1.default.model('User', UserSchema);
 // export userModels
 exports.default = UserModel;

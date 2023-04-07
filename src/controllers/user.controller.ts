@@ -8,8 +8,9 @@ import * as userServices from '../services/user.service';
 export const login = async (req: Request, res: Response) => {
         try {
                 const user = await userServices.login(req.body);
-                res.cookie('Authorization', user.token);
-                res.status(200).send(user);
+                res.cookie('Authorization', `Bearer ${user.token}`);
+                res.set('Authorization', `Bearer ${user.token}`);
+                res.status(200).json(user);
         } catch (error) {
                 return res.status(500).send(getErrorMessage(error));
         }
@@ -18,9 +19,10 @@ export const login = async (req: Request, res: Response) => {
 // handles users signup
 export const signup = async (req: Request, res: Response) => {
         try {
-                const newUser = req.body;
-                await userServices.register(newUser);
-                res.status(201).send('User created!');
+                const token = await userServices.register(req.body);
+                res.cookie('Authorization', `Bearer ${token?.token}`);
+                res.set('Authorization', `Bearer ${token?.token}`);
+                res.status(201).json(token);
         } catch (error) {
                 return res.status(500).send(getErrorMessage(error));
         }

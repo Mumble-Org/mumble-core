@@ -5,10 +5,23 @@ import jwt from 'jsonwebtoken';
 import { SECRET_KEY } from '../middlewares/auth';
 
 
-export async function register(user: HydratedDocument<I_UserDocument>): Promise<void> {
+export async function register(user: HydratedDocument<I_UserDocument>) {
         try {
-                const newUser = new UserModel(user);
-                await newUser.save();
+                const newUser = await UserModel.create(user);
+
+                if (!newUser) {
+                        throw new Error("Error occured while creating account");
+                }
+                if (newUser) {
+                        const token = jwt.sign({_id: newUser._id?.toString(),
+                                        name: newUser.name},
+                                        SECRET_KEY,
+                                        {
+                                                expiresIn: '2 days',
+                                        });
+                        newUser.password = "";
+                        return { token: token};
+                }
         } catch (error) {
                 throw error;
         }

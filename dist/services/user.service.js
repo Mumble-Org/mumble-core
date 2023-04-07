@@ -10,8 +10,18 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("../middlewares/auth");
 async function register(user) {
     try {
-        const newUser = new user_model_1.default(user);
-        await newUser.save();
+        const newUser = await user_model_1.default.create(user);
+        if (!newUser) {
+            throw new Error("Error occured while creating account");
+        }
+        if (newUser) {
+            const token = jsonwebtoken_1.default.sign({ _id: newUser._id?.toString(),
+                name: newUser.name }, auth_1.SECRET_KEY, {
+                expiresIn: '2 days',
+            });
+            newUser.password = "";
+            return { token: token };
+        }
     }
     catch (error) {
         throw error;

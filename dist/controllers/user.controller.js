@@ -31,8 +31,9 @@ const userServices = __importStar(require("../services/user.service"));
 const login = async (req, res) => {
     try {
         const user = await userServices.login(req.body);
-        res.cookie('Authorization', user.token);
-        res.status(200).send(user);
+        res.cookie('Authorization', `Bearer ${user.token}`);
+        res.set('Authorization', `Bearer ${user.token}`);
+        res.status(200).json(user);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
@@ -42,9 +43,10 @@ exports.login = login;
 // handles users signup
 const signup = async (req, res) => {
     try {
-        const newUser = req.body;
-        await userServices.register(newUser);
-        res.status(201).send('User created!');
+        const token = await userServices.register(req.body);
+        res.cookie('Authorization', `Bearer ${token?.token}`);
+        res.set('Authorization', `Bearer ${token?.token}`);
+        res.status(201).json(token);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
