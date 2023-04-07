@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 // routers
 app.use('/', user_routes_1.default);
 // Start serve3r on port {port}
-app.listen(port, () => {
+app.listen(3001, () => {
     console.log(`⚡️[server]: Server running at http://localhost:${port}`);
 });
 exports.default = app;

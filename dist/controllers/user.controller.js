@@ -34,7 +34,7 @@ const login = async (req, res) => {
         const user = await userServices.login(req.body);
         res.cookie("Authorization", `Bearer ${user.token}`);
         res.set("Authorization", `Bearer ${user.token}`);
-        res.status(200).json(user);
+        res.status(200).json({ user });
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
@@ -47,10 +47,10 @@ exports.login = login;
 const signup = async (req, res) => {
     try {
         const body = await userServices.parseUser(req.body);
-        const token = await userServices.register(body);
-        res.cookie("Authorization", `Bearer ${token?.token}`);
-        res.set("Authorization", `Bearer ${token?.token}`);
-        res.status(201).json(token);
+        const user = await userServices.register(body);
+        res.cookie("Authorization", `Bearer ${user?.token}`);
+        res.set("Authorization", `Bearer ${user?.token}`);
+        res.status(201).json(user);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
@@ -64,7 +64,7 @@ const confirmUsername = async (req, res) => {
     try {
         const user = req.body;
         const result = await userServices.checkName(user);
-        return res.status(200).send(result);
+        return res.status(200).json(result);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
@@ -78,7 +78,7 @@ const confirmEmail = async (req, res) => {
     try {
         const user = req.body;
         const result = await userServices.checkEmail(user);
-        return res.status(200).send(result);
+        return res.status(200).json(result);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
