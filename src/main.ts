@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import multer, {FileFilterCallback } from 'multer';
 import cors from 'cors';
 import './db';
 
@@ -25,7 +26,6 @@ app.use(cookieParser());
 app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-
 
 // Server Entry route
 app.get("/", (req: Request, res: Response) => {

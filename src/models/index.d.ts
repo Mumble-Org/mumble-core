@@ -12,3 +12,12 @@ export interface I_UserDocument {
 	portfolio?: Array<string>;
 	type: string;
 }
+
+
+/**
+* Audio model interface
+*/
+export interface I_AudioDocument {
+	name: string;
+	audioUrl: string;
+}
