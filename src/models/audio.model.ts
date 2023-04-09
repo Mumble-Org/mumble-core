@@ -16,6 +16,10 @@ const audioSchema = new mongoose.Schema<I_AudioDocument>({
         audioUrl: {
                 type: String,
                 required: true
+        },
+        imageUrl: {
+                type: String,
+                required: true
         }
 }, {timestamps: true});
 

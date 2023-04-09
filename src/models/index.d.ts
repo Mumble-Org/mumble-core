@@ -23,4 +23,5 @@ export interface I_AudioDocument {
 	name: string;
 	user_id: Types.ObjectId;
 	audioUrl: string;
+	imageUrl: string;
 }

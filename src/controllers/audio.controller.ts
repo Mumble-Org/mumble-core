@@ -1,6 +1,6 @@
 import { Request, Response} from 'express';
 import { getErrorMessage } from '../utils/errors.util';
-import { upload, deleteAudio } from '../utils/s3bucket.util';
+import { upload, deleteAudio, getSignedUrl } from '../utils/s3bucket.util';
 import AudioModel from '../models/audio.model';
 import _ from 'lodash'
 
@@ -19,7 +19,8 @@ export const uploadAudio = async (req: Request, res: Response) => {
                 const audio = new AudioModel({
                         name: req.file?.originalname,
                         audioUrl: s3Object?.Location,
-                        user_id: req.body.id
+                        user_id: req.body.id,
+                        imageUrl: req.body.imageUrl
                 });
 
                 const savedAudio = await audio.save();
@@ -46,10 +47,16 @@ export const getAudio = async (req: Request, res: Response) => {
                         return res.status(404).send('Audio not found');
                 }
 
+                // get audio from s3 bucket
+                const audioKey = `audio-${audio.user_id}-${audio.name}`;
+
+                const signedUrl = getSignedUrl(audioKey);
+
+
                 const audioR = _.omit(audio.toObject(), ["__v"]);
 
                 // Return audio file URL on s3
-                res.status(200).json({audioR});
+                res.status(200).json({ audioR, signedUrl });
         } catch (err) {
                 console.log(getErrorMessage(err));
                 res.status(500).send('Internal Server Error');

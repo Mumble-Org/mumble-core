@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAudio = exports.upload = exports.downloadAudio = exports.s3Client = void 0;
+exports.getSignedUrl = exports.deleteAudio = exports.upload = exports.downloadAudio = exports.s3Client = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const region = process.env.REGION;
 const bucket = process.env.BUCKET || "mumbleaudios";
@@ -61,3 +61,15 @@ const deleteAudio = (audio) => {
     return exports.s3Client.deleteObject(params).promise();
 };
 exports.deleteAudio = deleteAudio;
+/**
+ * Get temporary signed url to access bucket
+ */
+const getSignedUrl = (key) => {
+    const params = {
+        Bucket: bucket,
+        Key: key,
+        Expires: 3600
+    };
+    return exports.s3Client.getSignedUrl("getObject", params);
+};
+exports.getSignedUrl = getSignedUrl;

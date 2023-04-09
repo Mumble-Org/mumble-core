@@ -62,3 +62,17 @@ export const deleteAudio = (audio: string) => {
 
         return s3Client.deleteObject(params).promise();
 }
+
+
+/**
+ * Get temporary signed url to access bucket
+ */
+export const getSignedUrl = (key: string) => {
+        const params = {
+                Bucket: bucket,
+                Key: key,
+                Expires: 3600
+        };
+
+        return s3Client.getSignedUrl("getObject", params);
+}

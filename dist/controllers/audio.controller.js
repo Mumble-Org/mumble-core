@@ -46,9 +46,12 @@ const getAudio = async (req, res) => {
         if (!audio) {
             return res.status(404).send('Audio not found');
         }
+        // get audio from s3 bucket
+        const audioKey = `audio-${audio.user_id}-${audio.name}`;
+        const signedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
         const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
         // Return audio file URL on s3
-        res.status(200).json({ audioR });
+        res.status(200).json({ audioR, signedUrl });
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));
