@@ -3,12 +3,12 @@ import cookieParser from 'cookie-parser';
 import bodyParser from "body-parser";
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import multer, {FileFilterCallback } from 'multer';
 import cors from 'cors';
 import './db';
 
 // import routers
 import UserRouter from './routes/user.routes';
+import AudioRouter from './routes/audio.routes';
 
 dotenv.config();
 
@@ -34,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // routers
 app.use('/', UserRouter);
+app.use('/', AudioRouter);
 
 // Start serve3r on port {port}
 app.listen(port, () => {

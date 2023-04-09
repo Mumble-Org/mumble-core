@@ -20,7 +20,8 @@ const auth = async (req, res, next) => {
         next();
     }
     catch (err) {
-        res.status(401).send('Authorized to perform request.');
+        res.status(401).send('Unauthorized to perform request.');
     }
 };
 exports.auth = auth;
+exports.default = exports.auth;

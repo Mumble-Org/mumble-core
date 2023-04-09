@@ -36,8 +36,8 @@ export async function register(user: HydratedDocument<I_UserDocument>) {
  * Convert fields to lowercase
  */
 export async function parseUser(user: HydratedDocument<I_UserDocument>) {
-	user.name = user.name.toLowerCase();
-	user.email = user.email.toLowerCase();
+	user.name = user.name?.toLowerCase();
+	user.email = user.email?.toLowerCase();
 	user.genres = user.genres?.map((genre: string) => genre.toLowerCase());
 	user.portfolio = user.portfolio?.map((link: string) => link.toLowerCase());
 	return user;

@@ -1,3 +1,5 @@
+import {Types } from 'mongoose';
+
 /**
  * User model interface
  */
@@ -16,8 +18,9 @@ export interface I_UserDocument {
 
 /**
 * Audio model interface
-*/
+ */
 export interface I_AudioDocument {
 	name: string;
+	user_id: Types.ObjectId;
 	audioUrl: string;
 }

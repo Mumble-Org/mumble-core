@@ -8,7 +8,8 @@ import { Request } from 'express';
 const storage = multer.memoryStorage();
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
         if (file.mimetype !== "audio/mpeg" && file.mimetype !== "audio/wav") {
-               cb(null, false, new Error('Unsupported file type'));
+               cb(null, false);
+               throw new Error('Unsupported File format');
         } else {
                 cb(null, true);
         }

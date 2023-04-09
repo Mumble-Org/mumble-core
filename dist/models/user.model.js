@@ -59,7 +59,7 @@ UserSchema.pre("save", async function (next) {
     }
     next();
 });
-// create model/home/johnrumide/dev/mumble-core/src/services
+// create user model
 const UserModel = mongoose_1.default.model("User", UserSchema);
 // export userModels
 exports.default = UserModel;

@@ -35,8 +35,8 @@ exports.register = register;
  * Convert fields to lowercase
  */
 async function parseUser(user) {
-    user.name = user.name.toLowerCase();
-    user.email = user.email.toLowerCase();
+    user.name = user.name?.toLowerCase();
+    user.email = user.email?.toLowerCase();
     user.genres = user.genres?.map((genre) => genre.toLowerCase());
     user.portfolio = user.portfolio?.map((link) => link.toLowerCase());
     return user;
