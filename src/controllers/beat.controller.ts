@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
 import { upload, deleteAudio, getSignedUrl } from "../utils/s3bucket.util";
-import BeatModel from "../models/audio.model";
+import BeatModel from "../models/beat.model";
 import _ from "lodash";
 import { fileRequest } from ".";
 
@@ -10,7 +10,7 @@ import { fileRequest } from ".";
  * @param req
  * @param res
  */
-export const uploadAudio = async (req: fileRequest, res: Response) => {
+export const uploadBeat = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
 		const filename = req.file?.originalname;
@@ -18,7 +18,7 @@ export const uploadAudio = async (req: fileRequest, res: Response) => {
 
 		const audio = new BeatModel({
 			name: req.file?.originalname,
-			audioUrl: s3Object?.Location,
+			beatUrl: s3Object?.Location,
 			user_id: req.body.id,
 			imageUrl: req.body.imageUrl,
 		});
@@ -93,11 +93,11 @@ export const getBeats = async (req: Request, res: Response) => {
  * @param res
  * @returns
  */
-export const deleteAudioFile = async (req: Request, res: Response) => {
+export const deleteBeat = async (req: Request, res: Response) => {
 	try {
 		// find audio and delete from database
 		const audio = await BeatModel.findOneAndDelete({
-			audioUrl: req.body.audioUrl,
+			beatUrl: req.body.beatUrl,
 		});
 
 		if (!audio) {

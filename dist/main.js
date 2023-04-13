@@ -12,7 +12,7 @@ const cors_1 = __importDefault(require("cors"));
 require("./db");
 // import routers
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
-const audio_routes_1 = __importDefault(require("./routes/audio.routes"));
+const beat_routes_1 = __importDefault(require("./routes/beat.routes"));
 dotenv_1.default.config();
 // initialize Express app
 const app = (0, express_1.default)();
@@ -31,8 +31,8 @@ app.get("/", (req, res) => {
     res.send("Welcome to Mumble's API ⚡️");
 });
 // routers
-app.use('/', user_routes_1.default);
-app.use('/', audio_routes_1.default);
+app.use("/user", user_routes_1.default);
+app.use("/beat", beat_routes_1.default);
 // Start serve3r on port {port}
 app.listen(port, () => {
     console.log(`⚡️[server]: Server running at http://localhost:${port}`);
