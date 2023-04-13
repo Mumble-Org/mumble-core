@@ -2,9 +2,9 @@ import AWS from "aws-sdk";
 import { fileRequest } from "../controllers";
 
 const region = process.env.REGION;
-const bucket = process.env.BUCKET || "mumbleaudios";
-const accessKeyId = process.env.AWS_ACCESS_KEY;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
+const accessKeyId = process.env.MUMBLE_AWS_ACCESS_KEY;
+const secretAccessKey = process.env.MUMBLE_AWS_SECRET_ACCESS_KEY;
 
 /**
  * Set up AWS S3 Client
