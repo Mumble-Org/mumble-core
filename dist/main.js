@@ -31,8 +31,8 @@ app.get("/", (req, res) => {
     res.send("Welcome to Mumble's API ⚡️");
 });
 // routers
-app.use("/user", user_routes_1.default);
-app.use("/beat", beat_routes_1.default);
+app.use("/users", user_routes_1.default);
+app.use("/beats", beat_routes_1.default);
 // Start serve3r on port {port}
 app.listen(port, () => {
     console.log(`⚡️[server]: Server running at http://localhost:${port}`);

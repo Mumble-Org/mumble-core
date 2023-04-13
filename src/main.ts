@@ -33,8 +33,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // routers
-app.use("/user", UserRouter);
-app.use("/beat", BeatRouter);
+app.use("/users", UserRouter);
+app.use("/beats", BeatRouter);
 
 // Start serve3r on port {port}
 app.listen(port, () => {
