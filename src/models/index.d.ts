@@ -19,7 +19,7 @@ export interface I_UserDocument {
 /**
 * Audio model interface
  */
-export interface I_AudioDocument {
+export interface I_BeatDocument {
 	name: string;
 	user_id: Types.ObjectId;
 	audioUrl: string;

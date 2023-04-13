@@ -1,21 +1,22 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
 import { upload, deleteAudio, getSignedUrl } from "../utils/s3bucket.util";
-import AudioModel from "../models/audio.model";
+import BeatModel from "../models/audio.model";
 import _ from "lodash";
+import { fileRequest } from ".";
 
 /**
  * Define upload route's controller
  * @param req
  * @param res
  */
-export const uploadAudio = async (req: Request, res: Response) => {
+export const uploadAudio = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
 		const filename = req.file?.originalname;
 		const s3Object = await upload(req.body.id, filename, req);
 
-		const audio = new AudioModel({
+		const audio = new BeatModel({
 			name: req.file?.originalname,
 			audioUrl: s3Object?.Location,
 			user_id: req.body.id,
@@ -42,10 +43,10 @@ export const uploadAudio = async (req: Request, res: Response) => {
  * @param res
  * @returns
  */
-export const getAudio = async (req: Request, res: Response) => {
+export const getBeatsById = async (req: Request, res: Response) => {
 	try {
 		// Retrieve audio file URL from mongoDB by id
-		const audio = await AudioModel.findById(req.body.id);
+		const audio = await BeatModel.findById(req.params.id);
 		if (!audio) {
 			return res.status(404).send("Audio not found");
 		}
@@ -65,6 +66,27 @@ export const getAudio = async (req: Request, res: Response) => {
 	}
 };
 
+export const getBeats = async (req: Request, res: Response) => {
+	const page: number = parseInt(req.query?.page as string);
+	const limit: number = parseInt(req.query?.limit as string);
+	try {
+		// execute query with page and limit values
+		const beats = await BeatModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.exec();
+		const count = await BeatModel.countDocuments();
+
+		res.status(200).json({
+			beats,
+			totalPages: Math.ceil(count / limit),
+			currentPage: page,
+		});
+	} catch (err) {
+		console.error(getErrorMessage(err));
+		res.status(500).send("Internal Server Error");
+	}
+};
 /**
  * Delete audio from s3 bucket and database
  * @param req
@@ -74,7 +96,7 @@ export const getAudio = async (req: Request, res: Response) => {
 export const deleteAudioFile = async (req: Request, res: Response) => {
 	try {
 		// find audio and delete from database
-		const audio = await AudioModel.findOneAndDelete({
+		const audio = await BeatModel.findOneAndDelete({
 			audioUrl: req.body.audioUrl,
 		});
 

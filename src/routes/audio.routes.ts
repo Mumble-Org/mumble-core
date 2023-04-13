@@ -1,6 +1,6 @@
 import { Router} from "express";
 import auth from '../middlewares/auth'
-import { uploadAudio, getAudio, deleteAudioFile } from '../controllers/audio.controller';
+import { uploadAudio, getBeatsById, deleteAudioFile, getBeats } from '../controllers/audio.controller';
 import upload from '../middlewares/upload.middleware';
 
 
@@ -14,7 +14,8 @@ const router: Router = Router()
 * Define audio routes
 */
 router.post('/audio', auth, upload.single('audio'), uploadAudio);
-router.get('/audio', auth, getAudio);
+router.get('/audio/:id', auth, getBeatsById);
+router.get('/audio', getBeats);
 router.delete('/audio', auth, deleteAudioFile);
 
 export default router;
