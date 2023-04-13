@@ -1,9 +1,9 @@
-import { I_AudioDocument } from ".";
+import { I_BeatDocument } from ".";
 import mongoose from 'mongoose';
 
 
 // Audio schema
-const audioSchema = new mongoose.Schema<I_AudioDocument>({
+const beatSchema = new mongoose.Schema<I_BeatDocument>({
         name: {
                 type: String,
                 required: true
@@ -24,7 +24,7 @@ const audioSchema = new mongoose.Schema<I_AudioDocument>({
 }, {timestamps: true});
 
 // create audio model
-const AudioModel = mongoose.model<I_AudioDocument>('Audio',audioSchema);
+const BeatModel = mongoose.model<I_BeatDocument>('Audio', beatSchema);
 
 // export model
-export default AudioModel;
+export default BeatModel;
