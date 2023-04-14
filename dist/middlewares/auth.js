@@ -11,9 +11,12 @@ exports.SECRET_KEY = 'testkey' || process.env.MUMBLE_SECRET_KEY;
  */
 const auth = async (req, res, next) => {
     try {
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        let token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) {
-            throw new Error('Token missing');
+            token = req.cookies['Authorization']?.replace('Bearer ', '');
+            if (!token) {
+                throw new Error('Token missing');
+            }
         }
         const decoded = jsonwebtoken_1.default.verify(token, exports.SECRET_KEY);
         req.token = decoded;

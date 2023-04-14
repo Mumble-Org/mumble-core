@@ -12,10 +12,14 @@ export interface CustomRequest extends Request {
  */
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    let token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
-      throw new Error('Token missing');
+      token = req.cookies['Authorization']?.replace('Bearer ', '');
+
+      if (!token) {
+        throw new Error('Token missing');
+      }
     }
 
     const decoded = jwt.verify(token, SECRET_KEY);
