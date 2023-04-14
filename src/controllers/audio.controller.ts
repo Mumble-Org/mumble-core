@@ -66,8 +66,8 @@ export const getBeatsById = async (req: Request, res: Response) => {
 
 
 export const getBeats = async (req: Request, res: Response) => {
-        const page: number = req.query?.page;
-        const limit: number = req.query?.limit;
+        const page = req.query?.page;
+        const limit = req.query?.limit;
         try {
                 // execute query with page and limit values
                 const beats = await BeatModel.find()
