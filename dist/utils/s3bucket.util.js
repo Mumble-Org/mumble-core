@@ -6,30 +6,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSignedUrl = exports.deleteAudio = exports.upload = exports.downloadAudio = exports.s3Client = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const region = process.env.REGION;
-const bucket = process.env.BUCKET || "mumbleaudios";
-const accessKeyId = process.env.AWS_ACCESS_KEY;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
+const accessKeyId = process.env.MUMBLE_AWS_ACCESS_KEY;
+const secretAccessKey = process.env.MUMBLE_AWS_SECRET_ACCESS_KEY;
 /**
-* Set up AWS S3 Client
+ * Set up AWS S3 Client
  */
 exports.s3Client = new aws_sdk_1.default.S3({
     region,
     accessKeyId,
-    secretAccessKey
+    secretAccessKey,
 });
 /**
  * get audio from s3 bucket
- * @param audioUrl
+ * @param beatUrl
  * @returns promise
  */
-const downloadAudio = (audioUrl) => {
+const downloadAudio = (beatUrl) => {
     const params = {
-        Key: audioUrl,
-        Bucket: bucket
+        Key: beatUrl,
+        Bucket: bucket,
     };
-    return exports.s3Client.getObject(params, (err) => {
+    return exports.s3Client
+        .getObject(params, (err) => {
         console.log(err);
-    }).promise();
+    })
+        .promise();
 };
 exports.downloadAudio = downloadAudio;
 /**
@@ -42,7 +44,7 @@ const upload = (id, filename, req) => {
         const params = {
             Bucket: bucket,
             Key: `audio-${id}-${filename}`,
-            Body: req.file?.buffer
+            Body: req.file?.buffer,
         };
         return exports.s3Client.upload(params).promise();
     }
@@ -50,13 +52,13 @@ const upload = (id, filename, req) => {
 exports.upload = upload;
 /**
  * delete audio from s3 bucket
- * @param audioUrl
+ * @param beatUrl
  * @returns
  */
-const deleteAudio = (audio) => {
+const deleteAudio = (beatUrl) => {
     const params = {
         Bucket: bucket,
-        Key: audio
+        Key: beatUrl,
     };
     return exports.s3Client.deleteObject(params).promise();
 };
@@ -68,7 +70,7 @@ const getSignedUrl = (key) => {
     const params = {
         Bucket: bucket,
         Key: key,
-        Expires: 3600
+        Expires: 3600,
     };
     return exports.s3Client.getSignedUrl("getObject", params);
 };

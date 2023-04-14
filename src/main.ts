@@ -1,14 +1,14 @@
 import express, { Express, Request, Response } from "express";
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import './db';
+import helmet from "helmet";
+import dotenv from "dotenv";
+import cors from "cors";
+import "./db";
 
 // import routers
-import UserRouter from './routes/user.routes';
-import AudioRouter from './routes/audio.routes';
+import UserRouter from "./routes/user.routes";
+import BeatRouter from "./routes/beat.routes";
 
 dotenv.config();
 
@@ -29,16 +29,16 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 // Server Entry route
 app.get("/", (req: Request, res: Response) => {
-        res.send("Welcome to Mumble's API ⚡️");
+	res.send("Welcome to Mumble's API ⚡️");
 });
 
 // routers
-app.use('/', UserRouter);
-app.use('/', AudioRouter);
+app.use("/users", UserRouter);
+app.use("/beats", BeatRouter);
 
 // Start serve3r on port {port}
 app.listen(port, () => {
-        console.log(`⚡️[server]: Server running at http://localhost:${port}`);
+	console.log(`⚡️[server]: Server running at http://localhost:${port}`);
 });
 
 export default app;

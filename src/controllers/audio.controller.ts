@@ -103,13 +103,3 @@ export const deleteAudioFile = async (req: Request, res: Response) => {
 
                 // delete audio from s3 bucket
                 const audioKey = `audio-${audio.user_id}-${audio.name}`;
-
-                const deleted = await deleteAudio(audioKey);
-                if (deleted) {
-                        res.status(200).send('audio deleted!');
-                }
-        } catch (err) {
-                console.log(getErrorMessage(err));
-                res.status(500).send('Internal Server Error');
-        }
-}

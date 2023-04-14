@@ -22,6 +22,6 @@ export interface I_UserDocument {
 export interface I_BeatDocument {
 	name: string;
 	user_id: Types.ObjectId;
-	audioUrl: string;
+	beatUrl: string;
 	imageUrl: string;
 }
