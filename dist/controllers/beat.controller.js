@@ -18,6 +18,7 @@ const uploadBeat = async (req, res) => {
         // Save audio file to s3
         const filename = req.file?.originalname;
         const s3Object = await (0, s3bucket_util_1.upload)(req.body.id, filename, req);
+        console.log(s3Object.Location);
         const audio = new beat_model_1.default({
             name: req.file?.originalname,
             beatUrl: s3Object?.Location,

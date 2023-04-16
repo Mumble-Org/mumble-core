@@ -40,20 +40,25 @@ exports.downloadAudio = downloadAudio;
  * @returns promise
  */
 const upload = (id, filename, req) => {
-    if (filename != undefined && id) {
-        const params = {
-            Bucket: bucket,
-            Key: `audio-${id}-${filename}`,
-            Body: req.file?.buffer,
-        };
-        return exports.s3Client.upload(params).promise();
+    try {
+        if (filename != undefined && id) {
+            const params = {
+                Bucket: bucket,
+                Key: `audio-${id}-${filename}`,
+                Body: req.file?.buffer,
+            };
+            return exports.s3Client.upload(params).promise();
+        }
+    }
+    catch (err) {
+        console.log(err);
     }
 };
 exports.upload = upload;
 /**
  * delete audio from s3 bucket
  * @param beatUrl
- * @returns
+ * @returns promise
  */
 const deleteAudio = (beatUrl) => {
     const params = {

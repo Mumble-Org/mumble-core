@@ -44,21 +44,26 @@ export const upload = (
 	filename: string | undefined,
 	req: fileRequest
 ) => {
-	if (filename != undefined && id) {
-		const params = {
-			Bucket: bucket,
-			Key: `audio-${id}-${filename}`,
-			Body: req.file?.buffer,
-		};
+	try {
 
-		return s3Client.upload(params).promise();
+		if (filename != undefined && id) {
+			const params = {
+				Bucket: bucket,
+				Key: `audio-${id}-${filename}`,
+				Body: req.file?.buffer,
+			};
+
+			return s3Client.upload(params).promise();
+		}
+	} catch (err) {
+		console.log(err);
 	}
 };
 
 /**
  * delete audio from s3 bucket
  * @param beatUrl
- * @returns
+ * @returns promise	
  */
 export const deleteAudio = (beatUrl: string) => {
 	const params = {

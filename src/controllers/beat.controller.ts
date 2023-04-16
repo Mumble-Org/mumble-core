@@ -16,6 +16,8 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		const filename = req.file?.originalname;
 		const s3Object = await upload(req.body.id, filename, req);
 
+		console.log(s3Object.Location);
+
 		const audio = new BeatModel({
 			name: req.file?.originalname,
 			beatUrl: s3Object?.Location,
