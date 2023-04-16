@@ -19,6 +19,7 @@ const auth = async (req, res, next) => {
             }
         }
         const decoded = jsonwebtoken_1.default.verify(token, exports.SECRET_KEY);
+        req.body.id = decoded._id;
         req.token = decoded;
         next();
     }

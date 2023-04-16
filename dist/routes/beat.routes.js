@@ -9,13 +9,13 @@ const beat_controller_1 = require("../controllers/beat.controller");
 const upload_middleware_1 = __importDefault(require("../middlewares/upload.middleware"));
 /**
  * Initialize express router
-*/
+ */
 const router = (0, express_1.Router)();
 /**
-* Define audio routes
-*/
-router.post('', auth_1.default, upload_middleware_1.default.single('audio'), beat_controller_1.uploadBeat);
-router.get('/:id', auth_1.default, beat_controller_1.getBeatsById);
-router.get('', beat_controller_1.getBeats);
-router.delete('', auth_1.default, beat_controller_1.deleteBeat);
+ * Define audio routes
+ */
+router.post("", [upload_middleware_1.default.single("audio"), auth_1.default], beat_controller_1.uploadBeat);
+router.get("/:id", auth_1.default, beat_controller_1.getBeatsById);
+router.get("", beat_controller_1.getBeats);
+router.delete("", auth_1.default, beat_controller_1.deleteBeat);
 exports.default = router;
