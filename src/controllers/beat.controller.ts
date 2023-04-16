@@ -5,6 +5,7 @@ import BeatModel from "../models/beat.model";
 import _ from "lodash";
 import { fileRequest } from ".";
 
+
 /**
  * Define upload route's controller
  * @param req
@@ -13,14 +14,16 @@ import { fileRequest } from ".";
 export const uploadBeat = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
-		const filename = req.file?.originalname;
-		const s3Object = await upload(req.body.id, filename, req);
+		// const filename = req.files.audio[0].originalname;
+		// // const AudioS3Object = await upload(req.body.id, req.body.title, req);
+		// req.files.forEach((field) => {
 
-		console.log(s3Object.Location);
+		// })
+		// // const ImageS3Object = await upload(req);
 
 		const audio = new BeatModel({
-			name: req.file?.originalname,
-			beatUrl: s3Object?.Location,
+			name: req.body.title,
+			beatUrl: AudioS3Object?.Location,
 			user_id: req.body.id,
 			imageUrl: req.body.imageUrl,
 		});
@@ -38,6 +41,14 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		console.log(getErrorMessage(err));
 	}
 };
+
+
+// export const uploadImage = async (res: Response, req: Request) => {
+// 	try {
+// 		// 
+// 	}
+// };
+
 
 /**
  * get audio file
@@ -68,6 +79,12 @@ export const getBeatsById = async (req: Request, res: Response) => {
 	}
 };
 
+
+/**
+ * get all beats in database
+ * @param req 
+ * @param res 
+ */
 export const getBeats = async (req: Request, res: Response) => {
 	const page: number = parseInt(req.query?.page as string);
 	const limit: number = parseInt(req.query?.limit as string);
@@ -89,6 +106,8 @@ export const getBeats = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+
 /**
  * Delete audio from s3 bucket and database
  * @param req

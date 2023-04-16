@@ -41,15 +41,14 @@ export const downloadAudio = (beatUrl: string) => {
  */
 export const upload = (
 	id: string,
-	filename: string | undefined,
+	title: string | undefined,
 	req: fileRequest
 ) => {
 	try {
-
-		if (filename != undefined && id) {
+		if (title != undefined && id) {
 			const params = {
 				Bucket: bucket,
-				Key: `audio-${id}-${filename}`,
+				Key: `audio-${id}-${title}`,
 				Body: req.file?.buffer,
 			};
 
