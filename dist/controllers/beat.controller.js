@@ -16,13 +16,16 @@ const lodash_1 = __importDefault(require("lodash"));
 const uploadBeat = async (req, res) => {
     try {
         // Save audio file to s3
-        const filename = req.file?.originalname;
-        const s3Object = await (0, s3bucket_util_1.upload)(req.body.id, filename, req);
+        const file = req.files;
+        const AudioFile = file['audio'][0];
+        const ImageFile = file['image'][0];
+        const AudioS3Object = await (0, s3bucket_util_1.uploadAudio)(req.body.id, req.body.title, AudioFile);
+        const ImageS3Object = await (0, s3bucket_util_1.uploadImage)(req.body.id, req.body.title, ImageFile);
         const audio = new beat_model_1.default({
-            name: req.file?.originalname,
-            beatUrl: s3Object?.Location,
+            name: req.body.title,
+            beatUrl: AudioS3Object?.Location,
             user_id: req.body.id,
-            imageUrl: req.body.imageUrl,
+            imageUrl: ImageS3Object.Location
         });
         const savedAudio = await audio.save();
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
@@ -53,10 +56,12 @@ const getBeatsById = async (req, res) => {
         }
         // get audio from s3 bucket
         const audioKey = `audio-${audio.user_id}-${audio.name}`;
-        const signedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
+        const imageKey = `image-${audio.user_id}-${audio.name}`;
+        const audioSignedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
+        const imageSignedUrl = (0, s3bucket_util_1.getSignedUrl)(imageKey);
         const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
         // Return audio file URL on s3
-        res.status(200).json({ audioR, signedUrl });
+        res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl });
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));
@@ -64,6 +69,11 @@ const getBeatsById = async (req, res) => {
     }
 };
 exports.getBeatsById = getBeatsById;
+/**
+ * get all beats in database
+ * @param req
+ * @param res
+ */
 const getBeats = async (req, res) => {
     const page = parseInt(req.query?.page);
     const limit = parseInt(req.query?.limit);

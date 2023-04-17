@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSignedUrl = exports.deleteAudio = exports.upload = exports.downloadAudio = exports.s3Client = void 0;
+exports.getSignedUrl = exports.deleteAudio = exports.uploadImage = exports.uploadAudio = exports.downloadAudio = exports.s3Client = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const region = process.env.REGION;
 const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
@@ -39,13 +39,14 @@ exports.downloadAudio = downloadAudio;
  * @param req
  * @returns promise
  */
-const upload = (id, filename, req) => {
+const uploadAudio = (id, title, file) => {
     try {
-        if (filename != undefined && id) {
+        if (title != undefined && id) {
             const params = {
                 Bucket: bucket,
-                Key: `audio-${id}-${filename}`,
-                Body: req.file?.buffer,
+                Key: `audio-${id}-${title}`,
+                Body: file.buffer,
+                ContentType: file.mimetype
             };
             return exports.s3Client.upload(params).promise();
         }
@@ -54,7 +55,31 @@ const upload = (id, filename, req) => {
         console.log(err);
     }
 };
-exports.upload = upload;
+exports.uploadAudio = uploadAudio;
+/**
+ * upload image to s3 bucket
+ * @param id
+ * @param title
+ * @param file
+ * @returns promise
+ */
+const uploadImage = (id, title, file) => {
+    try {
+        if (title != undefined && id) {
+            const params = {
+                Bucket: bucket,
+                Key: `image-${id}-${title}`,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            };
+            return exports.s3Client.upload(params).promise();
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
+exports.uploadImage = uploadImage;
 /**
  * delete audio from s3 bucket
  * @param beatUrl

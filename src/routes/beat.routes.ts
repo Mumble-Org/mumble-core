@@ -16,7 +16,16 @@ const router: Router = Router();
 /**
  * Define audio routes
  */
-router.post("", [upload.single("audio"), auth], uploadBeat);
+router.post("", [upload.fields(
+	  [{
+        name: 'audio',
+        maxCount: 1
+
+    }, {
+        name: 'image',
+        maxCount: 1
+    }]
+), auth], uploadBeat);
 router.get("/:id", auth, getBeatsById);
 router.get("", getBeats);
 router.delete("", auth, deleteBeat);

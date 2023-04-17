@@ -14,7 +14,13 @@ const router = (0, express_1.Router)();
 /**
  * Define audio routes
  */
-router.post("", [upload_middleware_1.default.single("audio"), auth_1.default], beat_controller_1.uploadBeat);
+router.post("", [upload_middleware_1.default.fields([{
+            name: 'audio',
+            maxCount: 1
+        }, {
+            name: 'image',
+            maxCount: 1
+        }]), auth_1.default], beat_controller_1.uploadBeat);
 router.get("/:id", auth_1.default, beat_controller_1.getBeatsById);
 router.get("", beat_controller_1.getBeats);
 router.delete("", auth_1.default, beat_controller_1.deleteBeat);

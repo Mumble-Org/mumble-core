@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
 import * as userServices from "../services/user.service";
 
+
 /**
  * Logs in a user
  */
@@ -15,6 +16,7 @@ export const login = async (req: Request, res: Response) => {
 		return res.status(500).send(getErrorMessage(error));
 	}
 };
+
 
 /**
  * Signs up a user
@@ -31,6 +33,7 @@ export const signup = async (req: Request, res: Response) => {
 	}
 };
 
+
 /**
  * Confirms username input doesn't exist in the database
  */
@@ -43,6 +46,7 @@ export const confirmUsername = async (req: Request, res: Response) => {
 		return res.status(500).send(getErrorMessage(error));
 	}
 };
+
 
 /**
  * Confirms email input doesn't exist in the database

@@ -39,17 +39,18 @@ export const downloadAudio = (beatUrl: string) => {
  * @param req
  * @returns promise
  */
-export const upload = (
+export const uploadAudio = (
 	id: string,
 	title: string | undefined,
-	req: fileRequest
+	file: Express.Multer.File
 ) => {
 	try {
 		if (title != undefined && id) {
 			const params = {
 				Bucket: bucket,
 				Key: `audio-${id}-${title}`,
-				Body: req.file?.buffer,
+				Body: file.buffer,
+				ContentType: file.mimetype
 			};
 
 			return s3Client.upload(params).promise();
@@ -58,6 +59,36 @@ export const upload = (
 		console.log(err);
 	}
 };
+
+
+/**
+ * upload image to s3 bucket
+ * @param id 
+ * @param title 
+ * @param file 
+ * @returns promise
+ */
+export const uploadImage = (
+	id: string,
+	title: string | undefined,
+	file: Express.Multer.File
+) => {
+	try {
+		if (title != undefined && id) {
+			const params = {
+				Bucket: bucket,
+				Key: `image-${id}-${title}`,
+				Body: file.buffer,
+				ContentType: file.mimetype
+			};
+
+			return s3Client.upload(params).promise();
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+
 
 /**
  * delete audio from s3 bucket

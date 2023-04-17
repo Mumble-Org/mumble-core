@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
-import { upload, deleteAudio, getSignedUrl } from "../utils/s3bucket.util";
+import { deleteAudio, getSignedUrl, uploadAudio, uploadImage } from "../utils/s3bucket.util";
 import BeatModel from "../models/beat.model";
 import _ from "lodash";
 import { fileRequest } from ".";
@@ -14,18 +14,17 @@ import { fileRequest } from ".";
 export const uploadBeat = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
-		// const filename = req.files.audio[0].originalname;
-		// // const AudioS3Object = await upload(req.body.id, req.body.title, req);
-		// req.files.forEach((field) => {
-
-		// })
-		// // const ImageS3Object = await upload(req);
+		const file = req.files as { [fieldname: string]: Express.Multer.File[]};
+		const AudioFile = file['audio'][0];
+		const ImageFile = file['image'][0];
+		const AudioS3Object = await uploadAudio(req.body.id, req.body.title, AudioFile);
+		const ImageS3Object = await uploadImage(req.body.id, req.body.title, ImageFile);
 
 		const audio = new BeatModel({
 			name: req.body.title,
 			beatUrl: AudioS3Object?.Location,
 			user_id: req.body.id,
-			imageUrl: req.body.imageUrl,
+			imageUrl: ImageS3Object.Location
 		});
 
 		const savedAudio = await audio.save();
@@ -41,13 +40,6 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		console.log(getErrorMessage(err));
 	}
 };
-
-
-// export const uploadImage = async (res: Response, req: Request) => {
-// 	try {
-// 		// 
-// 	}
-// };
 
 
 /**
@@ -66,13 +58,15 @@ export const getBeatsById = async (req: Request, res: Response) => {
 
 		// get audio from s3 bucket
 		const audioKey = `audio-${audio.user_id}-${audio.name}`;
+		const imageKey = `image-${audio.user_id}-${audio.name}`;
 
-		const signedUrl = getSignedUrl(audioKey);
+		const audioSignedUrl = getSignedUrl(audioKey);
+		const imageSignedUrl = getSignedUrl(imageKey);
 
 		const audioR = _.omit(audio.toObject(), ["__v"]);
 
 		// Return audio file URL on s3
-		res.status(200).json({ audioR, signedUrl });
+		res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl });
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error");

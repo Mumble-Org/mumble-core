@@ -7,15 +7,7 @@ import { Request } from 'express';
  * Middleware to handle JSON file data
  * set up multer storage
  */
-const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-                if (file.fieldname === "audio") {
-                        cb(null, './uploads/audio');
-                } else if (file.fieldname === "image") {
-                        cb(null, './uploads/image');
-                }
-        }
-});
+const storage = multer.memoryStorage();
 
 /**
  * check file type and filter invalid files out
@@ -48,15 +40,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
 };
 
 // Create a multer storage instance
-const upload = multer({ storage: storage, fileFilter: fileFilter}).fields([
-    {
-        name: 'audio',
-        maxCount: 1
-
-    }, {
-        name: 'image',
-        maxCount: 1
-    }]
-);
+const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 export default upload;
