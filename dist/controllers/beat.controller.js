@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,6 +31,7 @@ const errors_util_1 = require("../utils/errors.util");
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const beat_model_1 = __importDefault(require("../models/beat.model"));
 const lodash_1 = __importDefault(require("lodash"));
+const beatServices = __importStar(require("../services/beat.services"));
 /**
  * Define upload route's controller
  * @param req
@@ -17,15 +41,15 @@ const uploadBeat = async (req, res) => {
     try {
         // Save audio file to s3
         const file = req.files;
-        const AudioFile = file['audio'][0];
-        const ImageFile = file['image'][0];
+        const AudioFile = file["audio"][0];
+        const ImageFile = file["image"][0];
         const AudioS3Object = await (0, s3bucket_util_1.uploadAudio)(req.body.id, req.body.title, AudioFile);
         const ImageS3Object = await (0, s3bucket_util_1.uploadImage)(req.body.id, req.body.title, ImageFile);
         const audio = new beat_model_1.default({
             name: req.body.title,
             beatUrl: AudioS3Object?.Location,
             user_id: req.body.id,
-            imageUrl: ImageS3Object.Location
+            imageUrl: ImageS3Object.Location,
         });
         const savedAudio = await audio.save();
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
@@ -84,8 +108,14 @@ const getBeats = async (req, res) => {
             .skip((page - 1) * limit)
             .exec();
         const count = await beat_model_1.default.countDocuments();
+        // Get URLs
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getSignedUrls(beat.toObject()));
+        }
+        const ret = await Promise.all(promises);
         res.status(200).json({
-            beats,
+            beats: ret,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
         });
