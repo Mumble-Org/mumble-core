@@ -21,12 +21,14 @@ const uploadBeat = async (req, res) => {
         const ImageFile = file['image'][0];
         const AudioS3Object = await (0, s3bucket_util_1.uploadAudio)(req.body.id, req.body.title, AudioFile);
         const ImageS3Object = await (0, s3bucket_util_1.uploadImage)(req.body.id, req.body.title, ImageFile);
+        // create instance of BeatModel
         const audio = new beat_model_1.default({
             name: req.body.title,
             beatUrl: AudioS3Object?.Location,
             user_id: req.body.id,
             imageUrl: ImageS3Object.Location
         });
+        // save to database
         const savedAudio = await audio.save();
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
             "__v",

@@ -20,6 +20,8 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		const AudioS3Object = await uploadAudio(req.body.id, req.body.title, AudioFile);
 		const ImageS3Object = await uploadImage(req.body.id, req.body.title, ImageFile);
 
+
+		// create instance of BeatModel
 		const audio = new BeatModel({
 			name: req.body.title,
 			beatUrl: AudioS3Object?.Location,
@@ -27,6 +29,7 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 			imageUrl: ImageS3Object.Location
 		});
 
+		// save to database
 		const savedAudio = await audio.save();
 		const audioR = _.omit(savedAudio.toObject(), [
 			"__v",
