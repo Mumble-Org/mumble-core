@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
-import { deleteAudio, getSignedUrl, uploadAudio, uploadImage } from "../utils/s3bucket.util";
+import {
+	deleteAudio,
+	getSignedUrl,
+	uploadAudio,
+	uploadImage,
+} from "../utils/s3bucket.util";
 import BeatModel from "../models/beat.model";
 import _ from "lodash";
 import { fileRequest } from ".";
-
+import * as beatServices from "../services/beat.services";
 
 /**
  * Define upload route's controller
@@ -14,11 +19,19 @@ import { fileRequest } from ".";
 export const uploadBeat = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
-		const file = req.files as { [fieldname: string]: Express.Multer.File[]};
-		const AudioFile = file['audio'][0];
-		const ImageFile = file['image'][0];
-		const AudioS3Object = await uploadAudio(req.body.id, req.body.title, AudioFile);
-		const ImageS3Object = await uploadImage(req.body.id, req.body.title, ImageFile);
+		const file = req.files as { [fieldname: string]: Express.Multer.File[] };
+		const AudioFile = file["audio"][0];
+		const ImageFile = file["image"][0];
+		const AudioS3Object = await uploadAudio(
+			req.body.id,
+			req.body.title,
+			AudioFile
+		);
+		const ImageS3Object = await uploadImage(
+			req.body.id,
+			req.body.title,
+			ImageFile
+		);
 
 
 		// create instance of BeatModel
@@ -26,7 +39,7 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 			name: req.body.title,
 			beatUrl: AudioS3Object?.Location,
 			user_id: req.body.id,
-			imageUrl: ImageS3Object.Location
+			imageUrl: ImageS3Object.Location,
 		});
 
 		// save to database
@@ -43,7 +56,6 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		console.log(getErrorMessage(err));
 	}
 };
-
 
 /**
  * get audio file
@@ -76,15 +88,14 @@ export const getBeatsById = async (req: Request, res: Response) => {
 	}
 };
 
-
 /**
  * get all beats in database
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 export const getBeats = async (req: Request, res: Response) => {
-	const page: number = parseInt(req.query?.page as string);
-	const limit: number = parseInt(req.query?.limit as string);
+	const page: number = parseInt(req.query?.page as string) || 1;
+	const limit: number = parseInt(req.query?.limit as string) || 20;
 	try {
 		// execute query with page and limit values
 		const beats = await BeatModel.find()
@@ -93,8 +104,15 @@ export const getBeats = async (req: Request, res: Response) => {
 			.exec();
 		const count = await BeatModel.countDocuments();
 
+		// Get URLs
+		const promises = [];
+		for (const beat of beats) {
+			promises.push(beatServices.getSignedUrls(beat.toObject()));
+		}
+		const ret = await Promise.all(promises);
+
 		res.status(200).json({
-			beats,
+			beats: ret,
 			totalPages: Math.ceil(count / limit),
 			currentPage: page,
 		});
@@ -103,7 +121,6 @@ export const getBeats = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
-
 
 /**
  * Delete audio from s3 bucket and database
