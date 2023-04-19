@@ -40,16 +40,28 @@ const beatServices = __importStar(require("../services/beat.services"));
 const uploadBeat = async (req, res) => {
     try {
         // Save audio file to s3
+        const { id, title, genre, license, price } = req.body;
+        const key = `${id}-${title}-${Date.now()}`;
         const file = req.files;
         const AudioFile = file["audio"][0];
         const ImageFile = file["image"][0];
-        const AudioS3Object = await (0, s3bucket_util_1.uploadAudio)(req.body.id, req.body.title, AudioFile);
-        const ImageS3Object = await (0, s3bucket_util_1.uploadImage)(req.body.id, req.body.title, ImageFile);
+        const dataFile = file["data"][0];
+        const DataS3Promise = (0, s3bucket_util_1.uploadData)(id, title, dataFile, key);
+        const AudioS3Promise = (0, s3bucket_util_1.uploadAudio)(id, title, AudioFile, key);
+        const ImageS3Promise = (0, s3bucket_util_1.uploadImage)(id, title, ImageFile, key);
+        const ImageS3Object = await ImageS3Promise;
+        const AudioS3Object = await AudioS3Promise;
+        const DataS3Object = await DataS3Promise;
         const audio = new beat_model_1.default({
-            name: req.body.title,
+            name: title,
             beatUrl: AudioS3Object?.Location,
             user_id: req.body.id,
             imageUrl: ImageS3Object.Location,
+            dataUrl: DataS3Object.Location,
+            genre,
+            price: Number(price),
+            license,
+            key,
         });
         const savedAudio = await audio.save();
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
@@ -79,13 +91,15 @@ const getBeatsById = async (req, res) => {
             return res.status(404).send("Audio not found");
         }
         // get audio from s3 bucket
-        const audioKey = `audio-${audio.user_id}-${audio.name}`;
-        const imageKey = `image-${audio.user_id}-${audio.name}`;
+        const audioKey = `audio-${audio.key}`;
+        const imageKey = `image-${audio.key}`;
+        const dataKey = `data-${audio.key}`;
         const audioSignedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
         const imageSignedUrl = (0, s3bucket_util_1.getSignedUrl)(imageKey);
+        const dataSignedUrl = (0, s3bucket_util_1.getSignedUrl)(dataKey);
         const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
         // Return audio file URL on s3
-        res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl });
+        res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));
@@ -99,8 +113,8 @@ exports.getBeatsById = getBeatsById;
  * @param res
  */
 const getBeats = async (req, res) => {
-    const page = parseInt(req.query?.page);
-    const limit = parseInt(req.query?.limit);
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 20;
     try {
         // execute query with page and limit values
         const beats = await beat_model_1.default.find()
@@ -111,7 +125,7 @@ const getBeats = async (req, res) => {
         // Get URLs
         const promises = [];
         for (const beat of beats) {
-            promises.push(beatServices.getSignedUrls(beat.toObject()));
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
         }
         const ret = await Promise.all(promises);
         res.status(200).json({

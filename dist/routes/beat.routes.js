@@ -24,6 +24,10 @@ router.post("", [
             name: "image",
             maxCount: 1,
         },
+        {
+            name: "data",
+            maxCount: 1,
+        }
     ]),
     auth_1.default,
 ], beat_controller_1.uploadBeat);
