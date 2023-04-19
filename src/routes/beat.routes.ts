@@ -45,6 +45,6 @@ router.get("/popular", getPopularBeats);
 router.get("", getBeats);
 router.get("/:id", auth, getBeatsById);
 router.delete("", auth, deleteBeat);
-router.put("/plays", auth, updateBeatPlays);
+router.put("/plays", updateBeatPlays);
 
 export default router;
