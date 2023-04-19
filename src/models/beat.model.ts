@@ -44,6 +44,11 @@ const beatSchema = new mongoose.Schema<I_BeatDocument>(
 		key: {
 			type: String,
 			required: true,
+		},
+		plays: {
+			type: Number,
+			default: 0,
+			required: true,
 		}
 	},
 	{ timestamps: true }
