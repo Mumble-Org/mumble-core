@@ -13,6 +13,9 @@ export interface I_UserDocument {
 	phone_number?: string;
 	portfolio?: Array<string>;
 	type: string;
+	beats: Array<Types.ObjectId>;
+	beats_sold: number;
+	beats_uploaded: number;
 }
 
 /**
