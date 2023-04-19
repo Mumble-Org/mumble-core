@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSignedUrl = exports.deleteAudio = exports.uploadData = exports.uploadImage = exports.uploadAudio = exports.downloadAudio = exports.s3Client = void 0;
+exports.getSignedUrl = exports.deleteFile = exports.uploadData = exports.uploadImage = exports.uploadAudio = exports.downloadAudio = exports.s3Client = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const region = process.env.REGION;
 const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
@@ -114,14 +114,14 @@ exports.uploadData = uploadData;
  * @param beatUrl
  * @returns promise
  */
-const deleteAudio = (beatUrl) => {
+const deleteFile = (beatUrl) => {
     const params = {
         Bucket: bucket,
         Key: beatUrl,
     };
     return exports.s3Client.deleteObject(params).promise();
 };
-exports.deleteAudio = deleteAudio;
+exports.deleteFile = deleteFile;
 /**
  * Get temporary signed url to access bucket
  */

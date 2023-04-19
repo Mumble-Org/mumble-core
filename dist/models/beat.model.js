@@ -46,6 +46,11 @@ const beatSchema = new mongoose_1.default.Schema({
     key: {
         type: String,
         required: true,
+    },
+    plays: {
+        type: Number,
+        default: 0,
+        required: true,
     }
 }, { timestamps: true });
 // create beat model

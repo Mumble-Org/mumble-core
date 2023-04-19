@@ -167,3 +167,100 @@ export const deleteBeat = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+export const getTrendingBeats = async (req: Request, res: Response) => {
+	const page: number = parseInt(req.query?.page as string) || 1;
+	const limit: number = parseInt(req.query?.limit as string) || 24;
+	try {
+		const oneMonthAgo = new Date();
+		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+		// Get beats created in the last month and sort by plays
+		const beats = await BeatModel.find({
+			createdAt: {
+				$gt: oneMonthAgo,
+			}
+		})
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({plays: 'desc'})
+			.exec();
+		const count = await BeatModel.countDocuments();
+
+		// Get URLs
+		const promises = [];
+		for (const beat of beats) {
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
+		}
+		const ret = await Promise.all(promises);
+
+		res.status(200).json({
+			beats: ret,
+			totalPages: Math.ceil(count / limit),
+			currentPage: page,
+		});
+	} catch (err) {
+		console.error(getErrorMessage(err));
+		res.status(500).send("Internal Server Error");
+	}
+};
+
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+export const getPopularBeats = async (req: Request, res: Response) => {
+	const page: number = parseInt(req.query?.page as string) || 1;
+	const limit: number = parseInt(req.query?.limit as string) || 24;
+	try {
+		const oneYearAgo = new Date();
+		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+		// Get beats created in the last year and sort by plays
+		const beats = await BeatModel.find({
+			createdAt: {
+				$gt: oneYearAgo,
+			}
+		})
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({plays: 'desc'})
+			.exec();
+		const count = await BeatModel.countDocuments();
+
+		// Get URLs
+		const promises = [];
+		for (const beat of beats) {
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
+		}
+		const ret = await Promise.all(promises);
+
+		res.status(200).json({
+			beats: ret,
+			totalPages: Math.ceil(count / limit),
+			currentPage: page,
+		});
+	} catch (err) {
+		console.error(getErrorMessage(err));
+		res.status(500).send("Internal Server Error");
+	}
+};
+
+export const updateBeatPlays = async (req: Request, res: Response) => {
+	const { id } = req.query;
+
+	try {
+		const beat = await BeatModel.findById(id);
+		beat.plays += 1;
+		beat.save();
+
+		return res.status(200).json({ status: 'ok' });
+	} catch (err) {
+		console.error(getErrorMessage(err));
+		return res.status(500).send("Internal Server Error");
+	}
+}

@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
+exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
 const errors_util_1 = require("../utils/errors.util");
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const beat_model_1 = __importDefault(require("../models/beat.model"));
@@ -52,6 +52,7 @@ const uploadBeat = async (req, res) => {
         const ImageS3Object = await ImageS3Promise;
         const AudioS3Object = await AudioS3Promise;
         const DataS3Object = await DataS3Promise;
+        // create instance of BeatModel
         const audio = new beat_model_1.default({
             name: title,
             beatUrl: AudioS3Object?.Location,
@@ -100,7 +101,9 @@ const getBeatsById = async (req, res) => {
         const dataSignedUrl = (0, s3bucket_util_1.getSignedUrl)(dataKey);
         const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
         // Return audio file URL on s3
-        res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
+        res
+            .status(200)
+            .json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));
@@ -157,10 +160,17 @@ const deleteBeat = async (req, res) => {
             return res.status(404).send("Audio not found");
         }
         // delete audio from s3 bucket
-        const audioKey = `audio-${audio.user_id}-${audio.name}`;
-        const deleted = await (0, s3bucket_util_1.deleteAudio)(audioKey);
-        if (deleted) {
+        const audioKey = `audio-${audio.key}`;
+        const imageKey = `image-${audio.key}`;
+        const dataKey = `data-${audio.key}`;
+        try {
+            await (0, s3bucket_util_1.deleteFile)(audioKey);
+            await (0, s3bucket_util_1.deleteFile)(imageKey);
+            await (0, s3bucket_util_1.deleteFile)(dataKey);
             res.status(200).send("audio deleted!");
+        }
+        catch (err) {
+            throw err;
         }
     }
     catch (err) {
@@ -169,3 +179,97 @@ const deleteBeat = async (req, res) => {
     }
 };
 exports.deleteBeat = deleteBeat;
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+const getTrendingBeats = async (req, res) => {
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 24;
+    try {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        // Get beats created in the last month and sort by plays
+        const beats = await beat_model_1.default.find({
+            createdAt: {
+                $gt: oneMonthAgo,
+            }
+        })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ plays: 'desc' })
+            .exec();
+        const count = await beat_model_1.default.countDocuments();
+        // Get URLs
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
+        }
+        const ret = await Promise.all(promises);
+        res.status(200).json({
+            beats: ret,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal Server Error");
+    }
+};
+exports.getTrendingBeats = getTrendingBeats;
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+const getPopularBeats = async (req, res) => {
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 24;
+    try {
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        // Get beats created in the last year and sort by plays
+        const beats = await beat_model_1.default.find({
+            createdAt: {
+                $gt: oneYearAgo,
+            }
+        })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ plays: 'desc' })
+            .exec();
+        const count = await beat_model_1.default.countDocuments();
+        // Get URLs
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
+        }
+        const ret = await Promise.all(promises);
+        res.status(200).json({
+            beats: ret,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal Server Error");
+    }
+};
+exports.getPopularBeats = getPopularBeats;
+const updateBeatPlays = async (req, res) => {
+    const { id } = req.query;
+    try {
+        const beat = await beat_model_1.default.findById(id);
+        beat.plays += 1;
+        beat.save();
+        return res.status(200).json({ status: 'ok' });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        return res.status(500).send("Internal Server Error");
+    }
+};
+exports.updateBeatPlays = updateBeatPlays;
