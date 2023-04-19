@@ -31,4 +31,5 @@ export interface I_BeatDocument {
 	price: number;
 	license: string;
 	key: string;
+	plays: number;
 }
