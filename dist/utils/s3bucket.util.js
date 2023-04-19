@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSignedUrl = exports.deleteAudio = exports.uploadImage = exports.uploadAudio = exports.downloadAudio = exports.s3Client = void 0;
+exports.getSignedUrl = exports.deleteAudio = exports.uploadData = exports.uploadImage = exports.uploadAudio = exports.downloadAudio = exports.s3Client = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const region = process.env.REGION;
 const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
@@ -36,15 +36,18 @@ const downloadAudio = (beatUrl) => {
 exports.downloadAudio = downloadAudio;
 /**
  * upload audio to s3 bucket
- * @param req
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
  * @returns promise
  */
-const uploadAudio = (id, title, file) => {
+const uploadAudio = (id, title, file, key) => {
     try {
         if (title != undefined && id) {
             const params = {
                 Bucket: bucket,
-                Key: `audio-${id}-${title}`,
+                Key: `audio-${key}`,
                 Body: file.buffer,
                 ContentType: file.mimetype
             };
@@ -58,17 +61,18 @@ const uploadAudio = (id, title, file) => {
 exports.uploadAudio = uploadAudio;
 /**
  * upload image to s3 bucket
- * @param id
- * @param title
- * @param file
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
  * @returns promise
  */
-const uploadImage = (id, title, file) => {
+const uploadImage = (id, title, file, key) => {
     try {
         if (title != undefined && id) {
             const params = {
                 Bucket: bucket,
-                Key: `image-${id}-${title}`,
+                Key: `image-${key}`,
                 Body: file.buffer,
                 ContentType: file.mimetype
             };
@@ -80,6 +84,31 @@ const uploadImage = (id, title, file) => {
     }
 };
 exports.uploadImage = uploadImage;
+/**
+ * upload beat data to s3 bucket
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
+ * @returns promise
+ */
+const uploadData = (id, title, file, key) => {
+    try {
+        if (title != undefined && id) {
+            const params = {
+                Bucket: bucket,
+                Key: `data-${key}`,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            };
+            return exports.s3Client.upload(params).promise();
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
+exports.uploadData = uploadData;
 /**
  * delete audio from s3 bucket
  * @param beatUrl

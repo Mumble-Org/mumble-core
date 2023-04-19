@@ -25,6 +25,28 @@ const beatSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    dataUrl: {
+        type: String,
+        required: true,
+    },
+    genre: {
+        type: String,
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    license: {
+        type: String,
+        enum: ['exclusive', 'basic', 'non-exclusive'],
+        default: 'exclusive',
+        required: true,
+    },
+    key: {
+        type: String,
+        required: true,
+    }
 }, { timestamps: true });
 // create beat model
 const BeatModel = mongoose_1.default.model("Beat", beatSchema);

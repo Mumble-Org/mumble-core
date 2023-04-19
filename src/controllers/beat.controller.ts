@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
 import {
-	deleteAudio,
+	deleteFile,
 	getSignedUrl,
 	uploadAudio,
 	uploadImage,
+	uploadData,
 } from "../utils/s3bucket.util";
 import BeatModel from "../models/beat.model";
 import _ from "lodash";
@@ -19,27 +20,32 @@ import * as beatServices from "../services/beat.services";
 export const uploadBeat = async (req: fileRequest, res: Response) => {
 	try {
 		// Save audio file to s3
+		const { id, title, genre, license, price } = req.body;
+		const key = `${id}-${title}-${Date.now()}`;
 		const file = req.files as { [fieldname: string]: Express.Multer.File[] };
 		const AudioFile = file["audio"][0];
 		const ImageFile = file["image"][0];
-		const AudioS3Object = await uploadAudio(
-			req.body.id,
-			req.body.title,
-			AudioFile
-		);
-		const ImageS3Object = await uploadImage(
-			req.body.id,
-			req.body.title,
-			ImageFile
-		);
+		const dataFile = file["data"][0];
+		const DataS3Promise = uploadData(id, title, dataFile, key);
+		const AudioS3Promise = uploadAudio(id, title, AudioFile, key);
+		const ImageS3Promise = uploadImage(id, title, ImageFile, key);
+
+		const ImageS3Object = await ImageS3Promise;
+		const AudioS3Object = await AudioS3Promise;
+		const DataS3Object = await DataS3Promise;
 
 
 		// create instance of BeatModel
 		const audio = new BeatModel({
-			name: req.body.title,
+			name: title,
 			beatUrl: AudioS3Object?.Location,
 			user_id: req.body.id,
 			imageUrl: ImageS3Object.Location,
+			dataUrl: DataS3Object.Location,
+			genre,
+			price: Number(price),
+			license,
+			key,
 		});
 
 		// save to database
@@ -72,16 +78,20 @@ export const getBeatsById = async (req: Request, res: Response) => {
 		}
 
 		// get audio from s3 bucket
-		const audioKey = `audio-${audio.user_id}-${audio.name}`;
-		const imageKey = `image-${audio.user_id}-${audio.name}`;
+		const audioKey = `audio-${audio.key}`;
+		const imageKey = `image-${audio.key}`;
+		const dataKey = `data-${audio.key}`;
 
 		const audioSignedUrl = getSignedUrl(audioKey);
 		const imageSignedUrl = getSignedUrl(imageKey);
+		const dataSignedUrl = getSignedUrl(dataKey);
 
 		const audioR = _.omit(audio.toObject(), ["__v"]);
 
 		// Return audio file URL on s3
-		res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl });
+		res
+			.status(200)
+			.json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error");
@@ -107,7 +117,7 @@ export const getBeats = async (req: Request, res: Response) => {
 		// Get URLs
 		const promises = [];
 		for (const beat of beats) {
-			promises.push(beatServices.getSignedUrls(beat.toObject()));
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
 		}
 		const ret = await Promise.all(promises);
 
@@ -140,11 +150,17 @@ export const deleteBeat = async (req: Request, res: Response) => {
 		}
 
 		// delete audio from s3 bucket
-		const audioKey = `audio-${audio.user_id}-${audio.name}`;
+		const audioKey = `audio-${audio.key}`;
+		const imageKey = `image-${audio.key}`;
+		const dataKey = `data-${audio.key}`;
 
-		const deleted = await deleteAudio(audioKey);
-		if (deleted) {
+		try {
+			await deleteFile(audioKey);
+			await deleteFile(imageKey);
+			await deleteFile(dataKey);
 			res.status(200).send("audio deleted!");
+		} catch (err) {
+			throw err;
 		}
 	} catch (err) {
 		console.log(getErrorMessage(err));

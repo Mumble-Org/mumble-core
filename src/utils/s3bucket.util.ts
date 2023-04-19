@@ -36,19 +36,23 @@ export const downloadAudio = (beatUrl: string) => {
 
 /**
  * upload audio to s3 bucket
- * @param req
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
  * @returns promise
  */
 export const uploadAudio = (
 	id: string,
 	title: string | undefined,
-	file: Express.Multer.File
+	file: Express.Multer.File,
+	key: string
 ) => {
 	try {
 		if (title != undefined && id) {
 			const params = {
 				Bucket: bucket,
-				Key: `audio-${id}-${title}`,
+				Key: `audio-${key}`,
 				Body: file.buffer,
 				ContentType: file.mimetype
 			};
@@ -63,21 +67,53 @@ export const uploadAudio = (
 
 /**
  * upload image to s3 bucket
- * @param id 
- * @param title 
- * @param file 
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
  * @returns promise
  */
 export const uploadImage = (
 	id: string,
 	title: string | undefined,
-	file: Express.Multer.File
+	file: Express.Multer.File,
+	key: string
 ) => {
 	try {
 		if (title != undefined && id) {
 			const params = {
 				Bucket: bucket,
-				Key: `image-${id}-${title}`,
+				Key: `image-${key}`,
+				Body: file.buffer,
+				ContentType: file.mimetype
+			};
+
+			return s3Client.upload(params).promise();
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+/**
+ * upload beat data to s3 bucket
+ * @param id user id
+ * @param title beat title
+ * @param file file to upload
+ * @param key key
+ * @returns promise
+ */
+export const uploadData = (
+	id: string,
+	title: string | undefined,
+	file: Express.Multer.File,
+	key: string
+) => {
+	try {
+		if (title != undefined && id) {
+			const params = {
+				Bucket: bucket,
+				Key: `data-${key}`,
 				Body: file.buffer,
 				ContentType: file.mimetype
 			};
@@ -95,7 +131,7 @@ export const uploadImage = (
  * @param beatUrl
  * @returns promise	
  */
-export const deleteAudio = (beatUrl: string) => {
+export const deleteFile = (beatUrl: string) => {
 	const params = {
 		Bucket: bucket,
 		Key: beatUrl,

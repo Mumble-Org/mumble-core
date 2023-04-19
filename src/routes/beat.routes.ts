@@ -28,6 +28,10 @@ router.post(
 				name: "image",
 				maxCount: 1,
 			},
+			{
+				name: "data",
+				maxCount: 1,
+			}
 		]),
 		auth,
 	],

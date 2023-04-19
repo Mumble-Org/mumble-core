@@ -6,5 +6,6 @@ export interface Beat {
 	imageUrl: string,
 	createdAt: string,
 	updatedAt: string,
-	__v?: number
+	__v?: number,
+	key: string,
 }
