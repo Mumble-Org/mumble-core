@@ -110,7 +110,7 @@ exports.checkEmail = checkEmail;
 async function getProducers(page, limit) {
     try {
         const producers = await user_model_1.default.find({ type: "producer" })
-            .sort({ "beats_sold": -1, "total_plays": -1 })
+            .sort({ "total_plays": -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();

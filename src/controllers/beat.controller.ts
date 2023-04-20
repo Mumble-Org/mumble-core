@@ -11,6 +11,8 @@ import BeatModel from "../models/beat.model";
 import _ from "lodash";
 import { fileRequest } from ".";
 import * as beatServices from "../services/beat.services";
+import UserModel from "../models/user.model";
+import { I_UserDocument } from "../models";
 
 /**
  * Define upload route's controller
@@ -48,8 +50,13 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 			key,
 		});
 
+
 		// save to database
 		const savedAudio = await audio.save();
+
+		
+		// update producer model
+		await UserModel.find({_id: req.body.id}).updateOne({"$inc": {"beats_uploaded": 1}});
 		const audioR = _.omit(savedAudio.toObject(), [
 			"__v",
 			"created_at",
@@ -250,6 +257,13 @@ export const getPopularBeats = async (req: Request, res: Response) => {
 	}
 };
 
+
+/**
+ * update number of plays for a beat and total plays for artists, or producers
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const updateBeatPlays = async (req: Request, res: Response) => {
 	const { id } = req.query;
 
@@ -257,6 +271,8 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 		const beat = await BeatModel.findById(id);
 		beat.plays += 1;
 		beat.save();
+
+		await UserModel.find({_id: beat.user_id}).updateOne({"$inc": {total_plays: 1}});
 
 		return res.status(200).json({ status: 'ok' });
 	} catch (err) {

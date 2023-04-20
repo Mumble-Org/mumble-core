@@ -32,6 +32,7 @@ const s3bucket_util_1 = require("../utils/s3bucket.util");
 const beat_model_1 = __importDefault(require("../models/beat.model"));
 const lodash_1 = __importDefault(require("lodash"));
 const beatServices = __importStar(require("../services/beat.services"));
+const user_model_1 = __importDefault(require("../models/user.model"));
 /**
  * Define upload route's controller
  * @param req
@@ -66,6 +67,8 @@ const uploadBeat = async (req, res) => {
         });
         // save to database
         const savedAudio = await audio.save();
+        // update producer model
+        await user_model_1.default.find({ _id: req.body.id }).updateOne({ "$inc": { "beats_uploaded": 1 } });
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
             "__v",
             "created_at",
@@ -259,12 +262,19 @@ const getPopularBeats = async (req, res) => {
     }
 };
 exports.getPopularBeats = getPopularBeats;
+/**
+ * update number of plays for a beat and total plays for artists, or producers
+ * @param req
+ * @param res
+ * @returns
+ */
 const updateBeatPlays = async (req, res) => {
     const { id } = req.query;
     try {
         const beat = await beat_model_1.default.findById(id);
         beat.plays += 1;
         beat.save();
+        await user_model_1.default.find({ _id: beat.user_id }).updateOne({ "$inc": { total_plays: 1 } });
         return res.status(200).json({ status: 'ok' });
     }
     catch (err) {

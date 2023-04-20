@@ -113,7 +113,7 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 export async function getProducers(page: number, limit: number) {
 	try {
 		const producers = await UserModel.find({ type: "producer"})
-																			.sort({"beats_sold": -1, "total_plays": -1})
+																			.sort({"total_plays": -1})
 																			.limit(limit * 1)
 																			.skip((page - 1) * limit)
 																			.exec();
