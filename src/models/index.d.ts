@@ -16,6 +16,8 @@ export interface I_UserDocument {
 	beats: Array<Types.ObjectId>;
 	beats_sold: number;
 	beats_uploaded: number;
+	songs_mixed: number;
+	rate: number;
 	total_plays: number;
 	rate: number;
 }
