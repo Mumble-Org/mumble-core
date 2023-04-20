@@ -70,7 +70,7 @@ export const confirmEmail = async (req: Request, res: Response) => {
 export const getTrendingProducers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
-		const limit: number = parseInt(req.query?.page as string) || 24;
+		const limit: number = parseInt(req.query?.limit as string) || 24;
 
 		const { producers, count } = await userServices.getProducers(page, limit);
 
@@ -94,7 +94,7 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
 export const getSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
-		const limit: number = parseInt(req.query?.page as string) || 24;
+		const limit: number = parseInt(req.query?.limit as string) || 24;
 
 		const {engineers, count} = await userServices.getEngineers(page, limit);
 

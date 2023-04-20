@@ -110,9 +110,9 @@ exports.checkEmail = checkEmail;
 async function getProducers(page, limit) {
     try {
         const producers = await user_model_1.default.find({ type: "producer" })
-            .sort({ "total_plays": -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .sort({ "total_plays": -1 })
             .exec();
         const count = await user_model_1.default.countDocuments();
         producers.forEach((producer) => {
@@ -135,9 +135,9 @@ exports.getProducers = getProducers;
 async function getEngineers(page, limit) {
     try {
         const engineers = await user_model_1.default.find({ type: "engineer" })
-            .sort({ "beats_sold": -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .sort({ "beats_sold": -1 })
             .exec();
         const count = await user_model_1.default.countDocuments();
         engineers.forEach((engineer) => {

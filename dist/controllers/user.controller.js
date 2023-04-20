@@ -93,7 +93,7 @@ exports.confirmEmail = confirmEmail;
 const getTrendingProducers = async (req, res) => {
     try {
         const page = parseInt(req.query?.page) || 1;
-        const limit = parseInt(req.query?.page) || 24;
+        const limit = parseInt(req.query?.limit) || 24;
         const { producers, count } = await userServices.getProducers(page, limit);
         res.status(200).json({
             producers,

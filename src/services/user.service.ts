@@ -113,9 +113,9 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 export async function getProducers(page: number, limit: number) {
 	try {
 		const producers = await UserModel.find({ type: "producer"})
-																			.sort({"total_plays": -1})
 																			.limit(limit * 1)
-																			.skip((page - 1) * limit)
+																			.skip((page -1 ) * limit)
+																			.sort({"total_plays": -1})
 																			.exec();
 		const count = await UserModel.countDocuments();
 
@@ -140,9 +140,9 @@ export async function getProducers(page: number, limit: number) {
 export async function getEngineers(page: number, limit: number) {
 	try {
 		const engineers = await UserModel.find({ type: "engineer"})
-																			.sort({"beats_sold": -1})
 																			.limit(limit * 1)
 																			.skip((page - 1) * limit)
+																			.sort({"beats_sold": -1})
 																			.exec();
 		const count = await UserModel.countDocuments();
 
