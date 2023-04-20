@@ -5,6 +5,9 @@ import {
 	getBeatsById,
 	deleteBeat,
 	getBeats,
+	getTrendingBeats,
+	getPopularBeats,
+	updateBeatPlays,
 } from "../controllers/beat.controller";
 import upload from "../middlewares/upload.middleware";
 
@@ -31,14 +34,17 @@ router.post(
 			{
 				name: "data",
 				maxCount: 1,
-			}
+			},
 		]),
 		auth,
 	],
 	uploadBeat
 );
-router.get("/:id", auth, getBeatsById);
+router.get("/trending", getTrendingBeats);
+router.get("/popular", getPopularBeats);
 router.get("", getBeats);
+router.get("/:id", auth, getBeatsById);
 router.delete("", auth, deleteBeat);
+router.put("/plays", updateBeatPlays);
 
 export default router;

@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
+exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
 const errors_util_1 = require("../utils/errors.util");
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const beat_model_1 = __importDefault(require("../models/beat.model"));
@@ -179,3 +179,97 @@ const deleteBeat = async (req, res) => {
     }
 };
 exports.deleteBeat = deleteBeat;
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+const getTrendingBeats = async (req, res) => {
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 24;
+    try {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        // Get beats created in the last month and sort by plays
+        const beats = await beat_model_1.default.find({
+            createdAt: {
+                $gt: oneMonthAgo,
+            }
+        })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ plays: 'desc' })
+            .exec();
+        const count = await beat_model_1.default.countDocuments();
+        // Get URLs
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
+        }
+        const ret = await Promise.all(promises);
+        res.status(200).json({
+            beats: ret,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal Server Error");
+    }
+};
+exports.getTrendingBeats = getTrendingBeats;
+/**
+ * get trending beats in database
+ * @param req
+ * @param res
+ */
+const getPopularBeats = async (req, res) => {
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 24;
+    try {
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        // Get beats created in the last year and sort by plays
+        const beats = await beat_model_1.default.find({
+            createdAt: {
+                $gt: oneYearAgo,
+            }
+        })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .sort({ plays: 'desc' })
+            .exec();
+        const count = await beat_model_1.default.countDocuments();
+        // Get URLs
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
+        }
+        const ret = await Promise.all(promises);
+        res.status(200).json({
+            beats: ret,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal Server Error");
+    }
+};
+exports.getPopularBeats = getPopularBeats;
+const updateBeatPlays = async (req, res) => {
+    const { id } = req.query;
+    try {
+        const beat = await beat_model_1.default.findById(id);
+        beat.plays += 1;
+        beat.save();
+        return res.status(200).json({ status: 'ok' });
+    }
+    catch (err) {
+        console.error((0, errors_util_1.getErrorMessage)(err));
+        return res.status(500).send("Internal Server Error");
+    }
+};
+exports.updateBeatPlays = updateBeatPlays;

@@ -27,11 +27,14 @@ router.post("", [
         {
             name: "data",
             maxCount: 1,
-        }
+        },
     ]),
     auth_1.default,
 ], beat_controller_1.uploadBeat);
-router.get("/:id", auth_1.default, beat_controller_1.getBeatsById);
+router.get("/trending", beat_controller_1.getTrendingBeats);
+router.get("/popular", beat_controller_1.getPopularBeats);
 router.get("", beat_controller_1.getBeats);
+router.get("/:id", auth_1.default, beat_controller_1.getBeatsById);
 router.delete("", auth_1.default, beat_controller_1.deleteBeat);
+router.put("/plays", beat_controller_1.updateBeatPlays);
 exports.default = router;
