@@ -68,7 +68,9 @@ const uploadBeat = async (req, res) => {
         // save to database
         const savedAudio = await audio.save();
         // update producer model
-        await user_model_1.default.find({ _id: req.body.id }).updateOne({ "$inc": { "beats_uploaded": 1 } });
+        await user_model_1.default.find({ _id: req.body.id }).updateOne({
+            $inc: { beats_uploaded: 1 },
+        });
         const audioR = lodash_1.default.omit(savedAudio.toObject(), [
             "__v",
             "created_at",
@@ -197,11 +199,11 @@ const getTrendingBeats = async (req, res) => {
         const beats = await beat_model_1.default.find({
             createdAt: {
                 $gt: oneMonthAgo,
-            }
+            },
         })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .sort({ plays: 'desc' })
+            .sort({ plays: "desc" })
             .exec();
         const count = await beat_model_1.default.countDocuments();
         // Get URLs
@@ -237,11 +239,11 @@ const getPopularBeats = async (req, res) => {
         const beats = await beat_model_1.default.find({
             createdAt: {
                 $gt: oneYearAgo,
-            }
+            },
         })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .sort({ plays: 'desc' })
+            .sort({ plays: "desc" })
             .exec();
         const count = await beat_model_1.default.countDocuments();
         // Get URLs
@@ -274,8 +276,10 @@ const updateBeatPlays = async (req, res) => {
         const beat = await beat_model_1.default.findById(id);
         beat.plays += 1;
         beat.save();
-        await user_model_1.default.find({ _id: beat.user_id }).updateOne({ "$inc": { total_plays: 1 } });
-        return res.status(200).json({ status: 'ok' });
+        await user_model_1.default.find({ _id: beat.user_id }).updateOne({
+            $inc: { total_plays: 1 },
+        });
+        return res.status(200).json({ status: "ok" });
     }
     catch (err) {
         console.error((0, errors_util_1.getErrorMessage)(err));
@@ -283,19 +287,18 @@ const updateBeatPlays = async (req, res) => {
     }
 };
 exports.updateBeatPlays = updateBeatPlays;
-const getBeatsByUserid = async (res, req) => {
+const getBeatsByUserid = async (req, res) => {
     try {
         const { id } = req.query;
         const beats = await beat_model_1.default.find({ user_id: id })
-            .sort({ "plays": -1 })
+            .sort({ plays: -1 })
             .exec();
-        // const promises = []
-        // for (const beat in beats) {
-        // 		promises.push(beatServices.getBeatDetails(beat.toObject()));
-        // }
-        // const result = await Promise.all(promises);
-        console.log(id, beats);
-        return res.status(200).json({ result: beats });
+        const promises = [];
+        for (const beat of beats) {
+            promises.push(beatServices.getBeatDetails(beat.toObject()));
+        }
+        const result = await Promise.all(promises);
+        return res.status(200).json(result);
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));

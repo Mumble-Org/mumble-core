@@ -44,8 +44,8 @@ router.post(
 router.get("/trending", getTrendingBeats);
 router.get("/popular", getPopularBeats);
 router.get("", getBeats);
-router.get("/:id", auth, getBeatsById);
 router.get("/getuserbeats/", getBeatsByUserid);
+router.get("/:id", auth, getBeatsById);
 router.delete("", auth, deleteBeat);
 router.put("/plays", updateBeatPlays);
 

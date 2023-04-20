@@ -36,7 +36,6 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		const AudioS3Object = await AudioS3Promise;
 		const DataS3Object = await DataS3Promise;
 
-
 		// create instance of BeatModel
 		const audio = new BeatModel({
 			name: title,
@@ -50,13 +49,13 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 			key,
 		});
 
-
 		// save to database
 		const savedAudio = await audio.save();
 
-		
 		// update producer model
-		await UserModel.find({_id: req.body.id}).updateOne({"$inc": {"beats_uploaded": 1}});
+		await UserModel.find({ _id: req.body.id }).updateOne({
+			$inc: { beats_uploaded: 1 },
+		});
 		const audioR = _.omit(savedAudio.toObject(), [
 			"__v",
 			"created_at",
@@ -190,11 +189,11 @@ export const getTrendingBeats = async (req: Request, res: Response) => {
 		const beats = await BeatModel.find({
 			createdAt: {
 				$gt: oneMonthAgo,
-			}
+			},
 		})
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
-			.sort({plays: 'desc'})
+			.sort({ plays: "desc" })
 			.exec();
 		const count = await BeatModel.countDocuments();
 
@@ -231,11 +230,11 @@ export const getPopularBeats = async (req: Request, res: Response) => {
 		const beats = await BeatModel.find({
 			createdAt: {
 				$gt: oneYearAgo,
-			}
+			},
 		})
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
-			.sort({plays: 'desc'})
+			.sort({ plays: "desc" })
 			.exec();
 		const count = await BeatModel.countDocuments();
 
@@ -257,12 +256,11 @@ export const getPopularBeats = async (req: Request, res: Response) => {
 	}
 };
 
-
 /**
  * update number of plays for a beat and total plays for artists, or producers
- * @param req 
- * @param res 
- * @returns 
+ * @param req
+ * @param res
+ * @returns
  */
 export const updateBeatPlays = async (req: Request, res: Response) => {
 	const { id } = req.query;
@@ -272,34 +270,35 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 		beat.plays += 1;
 		beat.save();
 
-		await UserModel.find({_id: beat.user_id}).updateOne({"$inc": {total_plays: 1}});
+		await UserModel.find({ _id: beat.user_id }).updateOne({
+			$inc: { total_plays: 1 },
+		});
 
-		return res.status(200).json({ status: 'ok' });
+		return res.status(200).json({ status: "ok" });
 	} catch (err) {
 		console.error(getErrorMessage(err));
 		return res.status(500).send("Internal Server Error");
 	}
-}
+};
 
-
-export const getBeatsByUserid = async (res: Response, req: Request) => {
+export const getBeatsByUserid = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.query;
-		
-		const beats = await BeatModel.find({ user_id: id})
-																	.sort({"plays": -1})
-																	.exec();
 
-		// const promises = []
-		// for (const beat in beats) {
-		// 		promises.push(beatServices.getBeatDetails(beat.toObject()));
-		// }
+		const beats = await BeatModel.find({ user_id: id })
+			.sort({ plays: -1 })
+			.exec();
 
-		// const result = await Promise.all(promises);
+		const promises = [];
+		for (const beat of beats) {
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
+		}
 
-		// return res.status(200).json({result});
+		const result = await Promise.all(promises);
+
+		return res.status(200).json(result);
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal server error!");
 	}
-}
+};
