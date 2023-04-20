@@ -31,4 +31,6 @@ router.post('/login', userController.login);
 router.post('/signup', userController.signup);
 router.post('/confirmUser', userController.confirmUsername);
 router.post('/confirmEmail', userController.confirmEmail);
+router.get('/trendingProducers', userController.getTrendingProducers);
+router.get('/engineers', userController.getSoundEngineers);
 exports.default = router;

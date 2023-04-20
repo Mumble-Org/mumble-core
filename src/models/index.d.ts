@@ -16,6 +16,7 @@ export interface I_UserDocument {
 	beats: Array<Types.ObjectId>;
 	beats_sold: number;
 	beats_uploaded: number;
+	total_plays: number;
 }
 
 /**

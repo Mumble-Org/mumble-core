@@ -102,3 +102,57 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 		throw error;
 	}
 }
+
+
+/**
+ * get trending producers from the database
+ * @param page 
+ * @param limit 
+ * @returns producers and no of producers
+ */
+export async function getProducers(page: number, limit: number) {
+	try {
+		const producers = await UserModel.find({ type: "producer"})
+																			.sort({"beats_sold": -1, "total_plays": -1})
+																			.limit(limit * 1)
+																			.skip((page - 1) * limit)
+																			.exec();
+		const count = await UserModel.countDocuments();
+
+		producers.forEach((producer) => {
+			producer.password = ""
+			producer.__v = "";
+		})
+		
+		return ({producers, count});
+	} catch (error) {
+		throw error;
+	}
+}
+
+
+/**
+ * get producers from db and sort based on sold beats and mixes
+ * @param page 
+ * @param limit 
+ * @returns engineers and count
+ */
+export async function getEngineers(page: number, limit: number) {
+	try {
+		const engineers = await UserModel.find({ type: "engineer"})
+																			.sort({"beats_sold": -1})
+																			.limit(limit * 1)
+																			.skip((page - 1) * limit)
+																			.exec();
+		const count = await UserModel.countDocuments();
+
+		engineers.forEach((engineer) => {
+			engineer.password = ""
+			engineer.__v = "";
+		})
+
+		return ({engineers, count});
+	} catch (err) {
+		throw err;
+	}
+}
