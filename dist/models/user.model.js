@@ -62,6 +62,16 @@ const UserSchema = new mongoose_1.default.Schema({
         default: 0,
         required: true,
     },
+    songs_mixed: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    rate: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
     total_plays: {
         type: Number,
         default: 0

@@ -88,6 +88,12 @@ export async function checkName(user: HydratedDocument<I_UserDocument>) {
 	}
 }
 
+
+/**
+ * confirm if user with the current email exists
+ * @param user 
+ * @returns 
+ */
 export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 	try {
 		const userFound = await UserModel.findOne({

@@ -19,7 +19,6 @@ export interface I_UserDocument {
 	songs_mixed: number;
 	rate: number;
 	total_plays: number;
-	rate: number;
 }
 
 /**

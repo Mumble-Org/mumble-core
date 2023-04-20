@@ -84,6 +84,11 @@ async function checkName(user) {
     }
 }
 exports.checkName = checkName;
+/**
+ * confirm if user with the current email exists
+ * @param user
+ * @returns
+ */
 async function checkEmail(user) {
     try {
         const userFound = await user_model_1.default.findOne({

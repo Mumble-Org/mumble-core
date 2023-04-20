@@ -8,6 +8,7 @@ import {
 	getTrendingBeats,
 	getPopularBeats,
 	updateBeatPlays,
+	getBeatsByUserid,
 } from "../controllers/beat.controller";
 import upload from "../middlewares/upload.middleware";
 
@@ -44,6 +45,7 @@ router.get("/trending", getTrendingBeats);
 router.get("/popular", getPopularBeats);
 router.get("", getBeats);
 router.get("/:id", auth, getBeatsById);
+router.get("/getuserbeats/", getBeatsByUserid);
 router.delete("", auth, deleteBeat);
 router.put("/plays", updateBeatPlays);
 

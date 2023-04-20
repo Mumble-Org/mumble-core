@@ -280,3 +280,26 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 		return res.status(500).send("Internal Server Error");
 	}
 }
+
+
+export const getBeatsByUserid = async (res: Response, req: Request) => {
+	try {
+		const { id } = req.query;
+		
+		const beats = await BeatModel.find({ user_id: id})
+																	.sort({"plays": -1})
+																	.exec();
+
+		// const promises = []
+		// for (const beat in beats) {
+		// 		promises.push(beatServices.getBeatDetails(beat.toObject()));
+		// }
+
+		// const result = await Promise.all(promises);
+
+		// return res.status(200).json({result});
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+}
