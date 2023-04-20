@@ -52,6 +52,7 @@ const uploadBeat = async (req, res) => {
         const ImageS3Object = await ImageS3Promise;
         const AudioS3Object = await AudioS3Promise;
         const DataS3Object = await DataS3Promise;
+        // create instance of BeatModel
         const audio = new beat_model_1.default({
             name: title,
             beatUrl: AudioS3Object?.Location,
@@ -100,7 +101,9 @@ const getBeatsById = async (req, res) => {
         const dataSignedUrl = (0, s3bucket_util_1.getSignedUrl)(dataKey);
         const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
         // Return audio file URL on s3
-        res.status(200).json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
+        res
+            .status(200)
+            .json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));
@@ -157,10 +160,17 @@ const deleteBeat = async (req, res) => {
             return res.status(404).send("Audio not found");
         }
         // delete audio from s3 bucket
-        const audioKey = `audio-${audio.user_id}-${audio.name}`;
-        const deleted = await (0, s3bucket_util_1.deleteAudio)(audioKey);
-        if (deleted) {
+        const audioKey = `audio-${audio.key}`;
+        const imageKey = `image-${audio.key}`;
+        const dataKey = `data-${audio.key}`;
+        try {
+            await (0, s3bucket_util_1.deleteFile)(audioKey);
+            await (0, s3bucket_util_1.deleteFile)(imageKey);
+            await (0, s3bucket_util_1.deleteFile)(dataKey);
             res.status(200).send("audio deleted!");
+        }
+        catch (err) {
+            throw err;
         }
     }
     catch (err) {

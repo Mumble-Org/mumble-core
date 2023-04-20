@@ -48,6 +48,20 @@ const UserSchema = new mongoose_1.default.Schema({
         enum: ["producer", "artist", "engineer"],
         default: "producer",
     },
+    beats: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Beat'
+        }],
+    beats_uploaded: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    beats_sold: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;

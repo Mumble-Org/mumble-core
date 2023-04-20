@@ -102,3 +102,25 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 		throw error;
 	}
 }
+
+
+/**
+ * get trending producers from the database
+ * @param page 
+ * @param limit 
+ * @returns producers and no of producers
+ */
+export async function getProducers(page: number, limit: number) {
+	try {
+		const producers = await UserModel.find({ type: "producers"})
+																			.sort({"beats_sold": -1})
+																			.limit(limit * 1)
+																			.skip((page - 1) * limit)
+																			.exec();
+		const count = await UserModel.countDocuments();
+		
+		return ({producers, count});
+	} catch (error) {
+		throw error
+	}
+}

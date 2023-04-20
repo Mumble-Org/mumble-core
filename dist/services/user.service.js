@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -101,3 +101,24 @@ async function checkEmail(user) {
     }
 }
 exports.checkEmail = checkEmail;
+/**
+ * get trending producers from the database
+ * @param page
+ * @param limit
+ * @returns producers and no of producers
+ */
+async function getProducers(page, limit) {
+    try {
+        const producers = await user_model_1.default.find({ type: "producers" })
+            .sort({ "beats_sold": -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+        const count = await user_model_1.default.countDocuments();
+        return ({ producers, count });
+    }
+    catch (error) {
+        throw error;
+    }
+}
+exports.getProducers = getProducers;
