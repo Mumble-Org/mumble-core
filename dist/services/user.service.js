@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -109,12 +109,16 @@ exports.checkEmail = checkEmail;
  */
 async function getProducers(page, limit) {
     try {
-        const producers = await user_model_1.default.find({ type: "producers" })
-            .sort({ "beats_sold": -1 })
+        const producers = await user_model_1.default.find({ type: "producer" })
+            .sort({ "beats_sold": -1, "total_plays": -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
         const count = await user_model_1.default.countDocuments();
+        producers.forEach((producer) => {
+            producer.password = "";
+            producer.__v = "";
+        });
         return ({ producers, count });
     }
     catch (error) {
@@ -122,3 +126,28 @@ async function getProducers(page, limit) {
     }
 }
 exports.getProducers = getProducers;
+/**
+ * get producers from db and sort based on sold beats and mixes
+ * @param page
+ * @param limit
+ * @returns engineers and count
+ */
+async function getEngineers(page, limit) {
+    try {
+        const engineers = await user_model_1.default.find({ type: "engineer" })
+            .sort({ "beats_sold": -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+        const count = await user_model_1.default.countDocuments();
+        engineers.forEach((engineer) => {
+            engineer.password = "";
+            engineer.__v = "";
+        });
+        return ({ engineers, count });
+    }
+    catch (err) {
+        throw err;
+    }
+}
+exports.getEngineers = getEngineers;

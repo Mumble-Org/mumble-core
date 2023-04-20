@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
+exports.getSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
 const errors_util_1 = require("../utils/errors.util");
 const userServices = __importStar(require("../services/user.service"));
 /**
@@ -107,3 +107,25 @@ const getTrendingProducers = async (req, res) => {
     }
 };
 exports.getTrendingProducers = getTrendingProducers;
+/**
+ * Responds with popular sound Engineers
+ * @param req
+ * @param res
+ */
+const getSoundEngineers = async (req, res) => {
+    try {
+        const page = parseInt(req.query?.page) || 1;
+        const limit = parseInt(req.query?.page) || 24;
+        const { engineers, count } = await userServices.getEngineers(page, limit);
+        res.status(200).json({
+            engineers,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page
+        });
+    }
+    catch (err) {
+        console.log((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal Server Error!");
+    }
+};
+exports.getSoundEngineers = getSoundEngineers;

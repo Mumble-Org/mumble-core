@@ -60,6 +60,10 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 			default: 0,
 			required: true,
 		},
+		total_plays: {
+			type: Number,
+			default: 0
+		}
 	},
 	{ timestamps: true }
 );

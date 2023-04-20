@@ -62,6 +62,10 @@ const UserSchema = new mongoose_1.default.Schema({
         default: 0,
         required: true,
     },
+    total_plays: {
+        type: Number,
+        default: 0
+    }
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;
