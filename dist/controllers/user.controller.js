@@ -115,7 +115,7 @@ exports.getTrendingProducers = getTrendingProducers;
 const getSoundEngineers = async (req, res) => {
     try {
         const page = parseInt(req.query?.page) || 1;
-        const limit = parseInt(req.query?.page) || 24;
+        const limit = parseInt(req.query?.limit) || 24;
         const { engineers, count } = await userServices.getEngineers(page, limit);
         res.status(200).json({
             engineers,

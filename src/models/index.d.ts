@@ -17,6 +17,7 @@ export interface I_UserDocument {
 	beats_sold: number;
 	beats_uploaded: number;
 	total_plays: number;
+	rate: number;
 }
 
 /**
