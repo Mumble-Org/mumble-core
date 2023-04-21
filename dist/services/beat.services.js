@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBeatDetails = void 0;
+exports.getFindObject = exports.getSortOrder = exports.getBeatDetails = void 0;
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const user_model_1 = __importDefault(require("../models/user.model"));
 /**
@@ -26,3 +26,50 @@ async function getBeatDetails(beat) {
     return ret;
 }
 exports.getBeatDetails = getBeatDetails;
+/**
+ * Get beat sorting order for user's query
+ * @param price user's price query
+ * @returns
+ */
+function getSortOrder(price) {
+    let order = {};
+    switch (price) {
+        case "lowest":
+            order = {
+                price: 1,
+                plays: "desc"
+            };
+            break;
+        case "highest":
+            order = {
+                price: -1,
+                plays: "desc"
+            };
+            break;
+        default:
+            order = {
+                plays: "desc"
+            };
+            break;
+    }
+    return order;
+}
+exports.getSortOrder = getSortOrder;
+function getFindObject(genre, date) {
+    switch (genre) {
+        case "":
+            return {
+                createdAt: {
+                    $gt: date,
+                }
+            };
+        default:
+            return {
+                createdAt: {
+                    $gt: date,
+                },
+                genre
+            };
+    }
+}
+exports.getFindObject = getFindObject;

@@ -4,8 +4,8 @@ import { Beat } from ".";
 
 /**
  * Asynchronously get pre-signed URLs for a beat
- * @param beat 
- * @returns 
+ * @param beat
+ * @returns
  */
 export async function getBeatDetails(beat: Beat) {
 	// get producer asynchronously
@@ -26,4 +26,53 @@ export async function getBeatDetails(beat: Beat) {
 	const ret = { ...beatObj, audioSignedUrl, imageSignedUrl, producer };
 
 	return ret;
+}
+
+/**
+ * Get beat sorting order for user's query
+ * @param price user's price query
+ * @returns
+ */
+export function getSortOrder(price: string) {
+	let order = {};
+
+	switch (price) {
+		case "lowest":
+			order = {
+				price: 1,
+				plays: "desc"
+			};
+			break;
+		case "highest":
+			order = {
+				price: -1,
+				plays: "desc"
+			};
+			break;
+		default:
+			order = {
+				plays: "desc"
+			};
+			break;
+	}
+
+	return order;
+}
+
+export function getFindObject(genre: string, date: Date) {
+	switch (genre) {
+		case "":
+			return {
+				createdAt: {
+					$gt: date,
+				}
+			};
+		default:
+			return {
+				createdAt: {
+					$gt: date,
+				},
+				genre
+			}
+	}
 }

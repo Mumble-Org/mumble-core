@@ -60,7 +60,7 @@ const uploadBeat = async (req, res) => {
             user_id: req.body.id,
             imageUrl: ImageS3Object.Location,
             dataUrl: DataS3Object.Location,
-            genre,
+            genre: genre.toLowerCase(),
             price: Number(price),
             license,
             key,
@@ -192,18 +192,16 @@ exports.deleteBeat = deleteBeat;
 const getTrendingBeats = async (req, res) => {
     const page = parseInt(req.query?.page) || 1;
     const limit = parseInt(req.query?.limit) || 24;
+    const { price, genre = "" } = req.query;
     try {
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
         // Get beats created in the last month and sort by plays
-        const beats = await beat_model_1.default.find({
-            createdAt: {
-                $gt: oneMonthAgo,
-            },
-        })
+        const beats = await beat_model_1.default.find(beatServices.getFindObject(genre, oneMonthAgo))
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .sort({ plays: "desc" })
+            .sort(beatServices.getSortOrder(price))
+            .sort()
             .exec();
         const count = await beat_model_1.default.countDocuments();
         // Get URLs
@@ -232,18 +230,15 @@ exports.getTrendingBeats = getTrendingBeats;
 const getPopularBeats = async (req, res) => {
     const page = parseInt(req.query?.page) || 1;
     const limit = parseInt(req.query?.limit) || 24;
+    const { price, genre = "" } = req.query;
     try {
         const oneYearAgo = new Date();
         oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
         // Get beats created in the last year and sort by plays
-        const beats = await beat_model_1.default.find({
-            createdAt: {
-                $gt: oneYearAgo,
-            },
-        })
+        const beats = await beat_model_1.default.find(beatServices.getFindObject(genre, oneYearAgo))
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .sort({ plays: "desc" })
+            .sort(beatServices.getSortOrder(price))
             .exec();
         const count = await beat_model_1.default.countDocuments();
         // Get URLs
@@ -287,6 +282,12 @@ const updateBeatPlays = async (req, res) => {
     }
 };
 exports.updateBeatPlays = updateBeatPlays;
+/**
+ * Get beats produced by a user
+ * @param req
+ * @param res
+ * @returns
+ */
 const getBeatsByUserid = async (req, res) => {
     try {
         const { id } = req.query;

@@ -43,7 +43,7 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 			user_id: req.body.id,
 			imageUrl: ImageS3Object.Location,
 			dataUrl: DataS3Object.Location,
-			genre,
+			genre: genre.toLowerCase(),
 			price: Number(price),
 			license,
 			key,
@@ -182,18 +182,18 @@ export const deleteBeat = async (req: Request, res: Response) => {
 export const getTrendingBeats = async (req: Request, res: Response) => {
 	const page: number = parseInt(req.query?.page as string) || 1;
 	const limit: number = parseInt(req.query?.limit as string) || 24;
+	const { price, genre = "" } = req.query;
+
 	try {
 		const oneMonthAgo = new Date();
 		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
 		// Get beats created in the last month and sort by plays
-		const beats = await BeatModel.find({
-			createdAt: {
-				$gt: oneMonthAgo,
-			},
-		})
+		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneMonthAgo))
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
-			.sort({ plays: "desc" })
+			.sort(beatServices.getSortOrder(price as string))
+			.sort()
 			.exec();
 		const count = await BeatModel.countDocuments();
 
@@ -223,18 +223,16 @@ export const getTrendingBeats = async (req: Request, res: Response) => {
 export const getPopularBeats = async (req: Request, res: Response) => {
 	const page: number = parseInt(req.query?.page as string) || 1;
 	const limit: number = parseInt(req.query?.limit as string) || 24;
+	const { price, genre = "" } = req.query;
+
 	try {
 		const oneYearAgo = new Date();
 		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 		// Get beats created in the last year and sort by plays
-		const beats = await BeatModel.find({
-			createdAt: {
-				$gt: oneYearAgo,
-			},
-		})
+		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneYearAgo))
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
-			.sort({ plays: "desc" })
+			.sort(beatServices.getSortOrder(price as string))
 			.exec();
 		const count = await BeatModel.countDocuments();
 
@@ -281,6 +279,12 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 	}
 };
 
+/**
+ * Get beats produced by a user
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const getBeatsByUserid = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.query;
