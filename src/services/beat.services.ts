@@ -68,7 +68,6 @@ export function getSortOrder(price: string) {
 export function getFindObject(genre: string, date: Date) {
 	switch (genre) {
 		case "All genres":
-			console.log("here");
 			return {
 				createdAt: {
 					$gt: date,
