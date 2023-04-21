@@ -59,6 +59,12 @@ export function getSortOrder(price: string) {
 	return order;
 }
 
+/**
+ * Add genre query if provided
+ * @param genre 
+ * @param date 
+ * @returns 
+ */
 export function getFindObject(genre: string, date: Date) {
 	switch (genre) {
 		case "":
