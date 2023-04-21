@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import bcrypt from "bcrypt";
 import { I_UserDocument } from ".";
 
@@ -73,7 +73,11 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 		total_plays: {
 			type: Number,
 			default: 0
-		}
+		},
+		saved_beats: [{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "beat"
+		}]
 	},
 	{ timestamps: true }
 );

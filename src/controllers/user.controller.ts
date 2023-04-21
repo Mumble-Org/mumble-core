@@ -71,8 +71,9 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
+		const location = req.query.location as string || "";
 
-		const { producers, count } = await userServices.getProducers(page, limit);
+		const { producers, count } = await userServices.getProducers(page, limit, location);
 
 		res.status(200).json({
 			producers,
@@ -95,8 +96,9 @@ export const getSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
+		const location = req.query.location as string || "";
 
-		const {engineers, count} = await userServices.getEngineers(page, limit);
+		const {engineers, count} = await userServices.getEngineers(page, limit, location);
 
 		res.status(200).json({
 			engineers,
@@ -106,5 +108,23 @@ export const getSoundEngineers = async (req: Request, res: Response) => {
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error!");
+	}
+}
+
+/**
+ * Save beat added by user to database
+ * @param req 
+ * @param res 
+ * @returns user and message
+ */
+export const SavedBeats = async (req: Request, res: Response) => {
+	try {
+		const {beat_id, id} = req.body;
+		const user = await userServices.saveBeat(beat_id, id);
+
+		return res.status(200).json({user, msg: "Beat saved"});
+	} catch (error) {
+		console.log(getErrorMessage(error));
+		res.status(500).send("Internal Server Error");
 	}
 }

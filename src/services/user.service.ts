@@ -116,13 +116,22 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
  * @param limit 
  * @returns producers and no of producers
  */
-export async function getProducers(page: number, limit: number) {
+export async function getProducers(page: number, limit: number, location: string) {
 	try {
-		const producers = await UserModel.find({ type: "producer"})
-																			.limit(limit * 1)
-																			.skip((page -1 ) * limit)
-																			.sort({"total_plays": -1})
-																			.exec();
+		let producers;
+		if (location && location != "") {
+			producers = await UserModel.find({type: "producer", location: location})
+																				.limit(limit * 1)
+																				.skip((page -1 ) * limit)
+																				.sort({"total_plays": -1})
+																				.exec();
+		} else {
+			producers = await UserModel.find({type: "producer"})
+																				.limit(limit * 1)
+																				.skip((page -1 ) * limit)
+																				.sort({"total_plays": -1})
+																				.exec();
+		}
 		const count = await UserModel.countDocuments();
 
 		producers.forEach((producer) => {
@@ -143,13 +152,23 @@ export async function getProducers(page: number, limit: number) {
  * @param limit 
  * @returns engineers and count
  */
-export async function getEngineers(page: number, limit: number) {
+export async function getEngineers(page: number, limit: number, location: string) {
 	try {
-		const engineers = await UserModel.find({ type: "engineer"})
+		let engineers;
+		if (location && location != "") {
+			engineers = await UserModel.find({ type: "engineer", location: location})
 																			.limit(limit * 1)
 																			.skip((page - 1) * limit)
 																			.sort({"beats_sold": -1})
 																			.exec();
+		} else {
+			engineers = await UserModel.find({ type: "engineer"})
+																				.limit(limit * 1)
+																				.skip((page - 1) * limit)
+																				.sort({"beats_sold": -1})
+																				.exec();
+		}
+
 		const count = await UserModel.countDocuments();
 
 		engineers.forEach((engineer) => {
@@ -160,5 +179,21 @@ export async function getEngineers(page: number, limit: number) {
 		return ({engineers, count});
 	} catch (err) {
 		throw err;
+	}
+}
+
+/**
+ * Save beat to user document in database
+ * @param beat_id 
+ * @param user_id 
+ * @returns 
+ */
+export async function saveBeat(beat_id: string, user_id: string) {
+	try {
+		const user = await UserModel.findByIdAndUpdate(user_id, {saved_beats: beat_id});
+
+		return {user: _.omit(user.toObject(), ["__v", "password"])};
+	} catch (error) {
+		throw error
 	}
 }
