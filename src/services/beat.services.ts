@@ -37,13 +37,13 @@ export function getSortOrder(price: string) {
 	let order = {};
 
 	switch (price) {
-		case "lowest":
+		case "Lowest first":
 			order = {
 				price: 1,
 				plays: "desc"
 			};
 			break;
-		case "highest":
+		case "Highest first":
 			order = {
 				price: -1,
 				plays: "desc"
