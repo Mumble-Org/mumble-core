@@ -34,13 +34,13 @@ exports.getBeatDetails = getBeatDetails;
 function getSortOrder(price) {
     let order = {};
     switch (price) {
-        case "lowest":
+        case "Lowest first":
             order = {
                 price: 1,
                 plays: "desc"
             };
             break;
-        case "highest":
+        case "Highest first":
             order = {
                 price: -1,
                 plays: "desc"
@@ -55,9 +55,16 @@ function getSortOrder(price) {
     return order;
 }
 exports.getSortOrder = getSortOrder;
+/**
+ * Add genre query if provided
+ * @param genre
+ * @param date
+ * @returns
+ */
 function getFindObject(genre, date) {
     switch (genre) {
-        case "":
+        case "All genres":
+            console.log("here");
             return {
                 createdAt: {
                     $gt: date,
