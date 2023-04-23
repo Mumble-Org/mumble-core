@@ -1,5 +1,4 @@
 import AWS from "aws-sdk";
-import { fileRequest } from "../controllers";
 
 const region = process.env.REGION;
 const bucket = process.env.MUMBLE_BUCKET || "mumbleaudios";
@@ -42,23 +41,16 @@ export const downloadAudio = (beatUrl: string) => {
  * @param key key
  * @returns promise
  */
-export const uploadAudio = (
-	id: string,
-	title: string | undefined,
-	file: Express.Multer.File,
-	key: string
-) => {
+export const uploadAudio = (file: Express.Multer.File, key: string) => {
 	try {
-		if (title != undefined && id) {
-			const params = {
-				Bucket: bucket,
-				Key: `audio-${key}`,
-				Body: file.buffer,
-				ContentType: file.mimetype,
-			};
+		const params = {
+			Bucket: bucket,
+			Key: `audio-${key}`,
+			Body: file.buffer,
+			ContentType: file.mimetype,
+		};
 
-			return s3Client.upload(params).promise();
-		}
+		return s3Client.upload(params).promise();
 	} catch (err) {
 		console.log(err);
 	}
@@ -66,29 +58,20 @@ export const uploadAudio = (
 
 /**
  * upload image to s3 bucket
- * @param id user id
- * @param title beat title
  * @param file file to upload
  * @param key key
  * @returns promise
  */
-export const uploadImage = (
-	id: string,
-	title: string | undefined,
-	file: Express.Multer.File,
-	key: string
-) => {
+export const uploadImage = (file: Express.Multer.File, key: string) => {
 	try {
-		if (title != undefined && id) {
-			const params = {
-				Bucket: bucket,
-				Key: `image-${key}`,
-				Body: file.buffer,
-				ContentType: file.mimetype,
-			};
+		const params = {
+			Bucket: bucket,
+			Key: `image-${key}`,
+			Body: file?.buffer,
+			ContentType: file.mimetype,
+		};
 
-			return s3Client.upload(params).promise();
-		}
+		return s3Client.upload(params).promise();
 	} catch (err) {
 		console.log(err);
 	}
@@ -96,29 +79,20 @@ export const uploadImage = (
 
 /**
  * upload beat data to s3 bucket
- * @param id user id
- * @param title beat title
  * @param file file to upload
  * @param key key
  * @returns promise
  */
-export const uploadData = (
-	id: string,
-	title: string | undefined,
-	file: Express.Multer.File,
-	key: string
-) => {
+export const uploadData = (file: Express.Multer.File, key: string) => {
 	try {
-		if (title != undefined && id) {
-			const params = {
-				Bucket: bucket,
-				Key: `data-${key}`,
-				Body: file.buffer,
-				ContentType: file.mimetype,
-			};
+		const params = {
+			Bucket: bucket,
+			Key: `data-${key}`,
+			Body: file.buffer,
+			ContentType: file.mimetype,
+		};
 
-			return s3Client.upload(params).promise();
-		}
+		return s3Client.upload(params).promise();
 	} catch (err) {
 		console.log(err);
 	}

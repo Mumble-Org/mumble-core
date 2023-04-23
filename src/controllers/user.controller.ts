@@ -143,14 +143,8 @@ export const SavedBeats = async (req: Request, res: Response) => {
 export const uploadProfileImage = async (req: Request, res: Response) => {
 	try {
 		const image = req.file;
-		console.log(image);
 		const key = `${req.body.id}-profile`;
-		const imgS3Object = await uploadImage(
-			req.body.id,
-			"profile-image",
-			image,
-			key
-		);
+		const imgS3Object = await uploadImage(image, key);
 
 		const user = await UserModel.findByIdAndUpdate(req.body.id, {
 			imageUrl: imgS3Object.Location,
