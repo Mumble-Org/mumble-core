@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.saveBeat = exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -112,13 +112,23 @@ exports.checkEmail = checkEmail;
  * @param limit
  * @returns producers and no of producers
  */
-async function getProducers(page, limit) {
+async function getProducers(page, limit, location) {
     try {
-        const producers = await user_model_1.default.find({ type: "producer" })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .sort({ "total_plays": -1 })
-            .exec();
+        let producers;
+        if (location && location != "") {
+            producers = await user_model_1.default.find({ type: "producer", location: location })
+                .limit(limit * 1)
+                .skip((page - 1) * limit)
+                .sort({ "total_plays": -1 })
+                .exec();
+        }
+        else {
+            producers = await user_model_1.default.find({ type: "producer" })
+                .limit(limit * 1)
+                .skip((page - 1) * limit)
+                .sort({ "total_plays": -1 })
+                .exec();
+        }
         const count = await user_model_1.default.countDocuments();
         producers.forEach((producer) => {
             producer.password = "";
@@ -137,13 +147,23 @@ exports.getProducers = getProducers;
  * @param limit
  * @returns engineers and count
  */
-async function getEngineers(page, limit) {
+async function getEngineers(page, limit, location) {
     try {
-        const engineers = await user_model_1.default.find({ type: "engineer" })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .sort({ "beats_sold": -1 })
-            .exec();
+        let engineers;
+        if (location && location != "") {
+            engineers = await user_model_1.default.find({ type: "engineer", location: location })
+                .limit(limit * 1)
+                .skip((page - 1) * limit)
+                .sort({ "beats_sold": -1 })
+                .exec();
+        }
+        else {
+            engineers = await user_model_1.default.find({ type: "engineer" })
+                .limit(limit * 1)
+                .skip((page - 1) * limit)
+                .sort({ "beats_sold": -1 })
+                .exec();
+        }
         const count = await user_model_1.default.countDocuments();
         engineers.forEach((engineer) => {
             engineer.password = "";
@@ -156,3 +176,19 @@ async function getEngineers(page, limit) {
     }
 }
 exports.getEngineers = getEngineers;
+/**
+ * Save beat to user document in database
+ * @param beat_id
+ * @param user_id
+ * @returns
+ */
+async function saveBeat(beat_id, user_id) {
+    try {
+        const user = await user_model_1.default.findByIdAndUpdate(user_id, { saved_beats: beat_id });
+        return { user: lodash_1.default.omit(user.toObject(), ["__v", "password"]) };
+    }
+    catch (error) {
+        throw error;
+    }
+}
+exports.saveBeat = saveBeat;

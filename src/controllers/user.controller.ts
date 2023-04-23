@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { getErrorMessage } from "../utils/errors.util";
+// import upload from "../utils/s3bucket.utils";
 import * as userServices from "../services/user.service";
+import { getSignedUrl, uploadImage } from "../utils/s3bucket.util";
+import UserModel from "../models/user.model";
 
 
 /**
@@ -71,8 +74,9 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
+		const location = req.query.location as string || "";
 
-		const { producers, count } = await userServices.getProducers(page, limit);
+		const { producers, count } = await userServices.getProducers(page, limit, location);
 
 		res.status(200).json({
 			producers,
@@ -95,8 +99,9 @@ export const getSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
+		const location = req.query.location as string || "";
 
-		const {engineers, count} = await userServices.getEngineers(page, limit);
+		const {engineers, count} = await userServices.getEngineers(page, limit, location);
 
 		res.status(200).json({
 			engineers,
@@ -108,3 +113,70 @@ export const getSoundEngineers = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error!");
 	}
 }
+
+/**
+ * Save beat added by user to database
+ * @param req 
+ * @param res 
+ * @returns user and message
+ */
+export const SavedBeats = async (req: Request, res: Response) => {
+	try {
+		const {beat_id, id} = req.body;
+		const user = await userServices.saveBeat(beat_id, id);
+
+		return res.status(200).json({user, msg: "Beat saved"});
+	} catch (error) {
+		console.log(getErrorMessage(error));
+		res.status(500).send("Internal Server Error");
+	}
+}
+
+/**
+ * upload profile image and update url to image in the database
+ * @params req
+ * @params res
+ * @returns user profile
+ */
+export const uploadProfileImage = async (req: Request, res: Response) => {
+	try {
+		const image = req.file;
+		const key = `${req.body.id}-profile`;
+		const imgS3Object = await uploadImage(req.body.id, "profile-image", image, key);
+
+		const user = await UserModel.findByIdAndUpdate(req.body.id, {imageUrl: imgS3Object.Location});
+		if (user) {
+			const signedUrl = getSignedUrl(user.imageUrl);
+			res.status(203).json({user, imageUrl: signedUrl});
+		}
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal Server Error");
+	}
+}
+
+/**
+ * get user details and signedUrl for profile image
+ * @param req 
+ * @param res 
+ * @returns HTTP response
+ */
+export const getProfileImage = async (req: Request, res: Response) => {
+	try {
+		const user = await UserModel.findOne({_id: req.body.id});
+		if (user) {
+			if (user.imageUrl && user.imageUrl != "") {
+				const signedUrl = getSignedUrl(user.imageUrl);
+				return res.status(200).json({user, imageUrl: signedUrl});
+			} else {
+				return res.status(200).json({user, imageUrl: null});
+			}
+		} else {
+			return res.status(400).json({msg: "User Not found!"});
+		}
+	} catch (error) {
+		console.log(getErrorMessage(error));
+		res.status(500).send("Internal Server Error");
+	}
+}
+

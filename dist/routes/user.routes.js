@@ -22,9 +22,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController = __importStar(require("../controllers/user.controller"));
+const auth_1 = __importDefault(require("../middlewares/auth"));
+const upload_middleware_1 = __importDefault(require("../middlewares/upload.middleware"));
 const router = (0, express_1.Router)();
 // user routes
 router.post('/login', userController.login);
@@ -33,4 +38,7 @@ router.post('/confirmUser', userController.confirmUsername);
 router.post('/confirmEmail', userController.confirmEmail);
 router.get('/trendingProducers', userController.getTrendingProducers);
 router.get('/engineers', userController.getSoundEngineers);
+router.get('/profile', auth_1.default, userController.getProfileImage);
+router.put('/save', auth_1.default, userController.SavedBeats);
+router.put('/profileImage', [upload_middleware_1.default.single('image'), auth_1.default], userController.uploadProfileImage);
 exports.default = router;
