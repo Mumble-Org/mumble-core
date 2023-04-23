@@ -64,7 +64,6 @@ exports.getSortOrder = getSortOrder;
 function getFindObject(genre, date) {
     switch (genre) {
         case "All genres":
-            console.log("here");
             return {
                 createdAt: {
                     $gt: date,
