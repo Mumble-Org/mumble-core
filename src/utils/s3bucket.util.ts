@@ -54,7 +54,7 @@ export const uploadAudio = (
 				Bucket: bucket,
 				Key: `audio-${key}`,
 				Body: file.buffer,
-				ContentType: file.mimetype
+				ContentType: file.mimetype,
 			};
 
 			return s3Client.upload(params).promise();
@@ -63,7 +63,6 @@ export const uploadAudio = (
 		console.log(err);
 	}
 };
-
 
 /**
  * upload image to s3 bucket
@@ -85,7 +84,7 @@ export const uploadImage = (
 				Bucket: bucket,
 				Key: `image-${key}`,
 				Body: file.buffer,
-				ContentType: file.mimetype
+				ContentType: file.mimetype,
 			};
 
 			return s3Client.upload(params).promise();
@@ -115,7 +114,7 @@ export const uploadData = (
 				Bucket: bucket,
 				Key: `data-${key}`,
 				Body: file.buffer,
-				ContentType: file.mimetype
+				ContentType: file.mimetype,
 			};
 
 			return s3Client.upload(params).promise();
@@ -125,11 +124,10 @@ export const uploadData = (
 	}
 };
 
-
 /**
  * delete audio from s3 bucket
  * @param beatUrl
- * @returns promise	
+ * @returns promise
  */
 export const deleteFile = (beatUrl: string) => {
 	const params = {

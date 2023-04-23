@@ -49,10 +49,12 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 			enum: ["producer", "artist", "engineer"],
 			default: "producer",
 		},
-		beats: [{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Beat'
-		}],
+		beats: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Beat",
+			},
+		],
 		beats_uploaded: {
 			type: Number,
 			default: 0,
@@ -75,12 +77,14 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 		},
 		total_plays: {
 			type: Number,
-			default: 0
+			default: 0,
 		},
-		saved_beats: [{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "beat"
-		}]
+		saved_beats: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "beat",
+			},
+		],
 	},
 	{ timestamps: true }
 );

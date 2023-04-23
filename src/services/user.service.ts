@@ -64,7 +64,10 @@ export async function login(user: HydratedDocument<I_UserDocument>) {
 				}
 			);
 			userFound.password = "";
-			return { user: _.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]), token: token };
+			return {
+				user: _.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]),
+				token: token,
+			};
 		} else {
 			throw new Error("Password is not correct");
 		}
@@ -88,11 +91,10 @@ export async function checkName(user: HydratedDocument<I_UserDocument>) {
 	}
 }
 
-
 /**
  * confirm if user with the current email exists
- * @param user 
- * @returns 
+ * @param user
+ * @returns
  */
 export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 	try {
@@ -109,74 +111,80 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 	}
 }
 
-
 /**
  * get trending producers from the database
- * @param page 
- * @param limit 
+ * @param page
+ * @param limit
  * @returns producers and no of producers
  */
-export async function getProducers(page: number, limit: number, location: string) {
+export async function getProducers(
+	page: number,
+	limit: number,
+	location: string
+) {
 	try {
 		let producers;
 		if (location && location != "") {
-			producers = await UserModel.find({type: "producer", location: location})
-																				.limit(limit * 1)
-																				.skip((page -1 ) * limit)
-																				.sort({"total_plays": -1})
-																				.exec();
+			producers = await UserModel.find({ type: "producer", location: location })
+				.limit(limit * 1)
+				.skip((page - 1) * limit)
+				.sort({ total_plays: -1 })
+				.exec();
 		} else {
-			producers = await UserModel.find({type: "producer"})
-																				.limit(limit * 1)
-																				.skip((page -1 ) * limit)
-																				.sort({"total_plays": -1})
-																				.exec();
+			producers = await UserModel.find({ type: "producer" })
+				.limit(limit * 1)
+				.skip((page - 1) * limit)
+				.sort({ total_plays: -1 })
+				.exec();
 		}
 		const count = await UserModel.countDocuments();
 
 		producers.forEach((producer) => {
-			producer.password = ""
+			producer.password = "";
 			producer.__v = "";
-		})
-		
-		return ({producers, count});
+		});
+
+		return { producers, count };
 	} catch (error) {
 		throw error;
 	}
 }
 
-
 /**
  * get producers from db and sort based on sold beats and mixes
- * @param page 
- * @param limit 
+ * @param page
+ * @param limit
  * @returns engineers and count
  */
-export async function getEngineers(page: number, limit: number, location: string) {
+export async function getEngineers(
+	page: number,
+	limit: number,
+	location: string
+) {
 	try {
 		let engineers;
 		if (location && location != "") {
-			engineers = await UserModel.find({ type: "engineer", location: location})
-																			.limit(limit * 1)
-																			.skip((page - 1) * limit)
-																			.sort({"beats_sold": -1})
-																			.exec();
+			engineers = await UserModel.find({ type: "engineer", location: location })
+				.limit(limit * 1)
+				.skip((page - 1) * limit)
+				.sort({ beats_sold: -1 })
+				.exec();
 		} else {
-			engineers = await UserModel.find({ type: "engineer"})
-																				.limit(limit * 1)
-																				.skip((page - 1) * limit)
-																				.sort({"beats_sold": -1})
-																				.exec();
+			engineers = await UserModel.find({ type: "engineer" })
+				.limit(limit * 1)
+				.skip((page - 1) * limit)
+				.sort({ beats_sold: -1 })
+				.exec();
 		}
 
 		const count = await UserModel.countDocuments();
 
 		engineers.forEach((engineer) => {
-			engineer.password = ""
+			engineer.password = "";
 			engineer.__v = "";
-		})
+		});
 
-		return ({engineers, count});
+		return { engineers, count };
 	} catch (err) {
 		throw err;
 	}
@@ -184,16 +192,18 @@ export async function getEngineers(page: number, limit: number, location: string
 
 /**
  * Save beat to user document in database
- * @param beat_id 
- * @param user_id 
- * @returns 
+ * @param beat_id
+ * @param user_id
+ * @returns
  */
 export async function saveBeat(beat_id: string, user_id: string) {
 	try {
-		const user = await UserModel.findByIdAndUpdate(user_id, {saved_beats: beat_id});
+		const user = await UserModel.findByIdAndUpdate(user_id, {
+			saved_beats: beat_id,
+		});
 
-		return {user: _.omit(user.toObject(), ["__v", "password"])};
+		return { user: _.omit(user.toObject(), ["__v", "password"]) };
 	} catch (error) {
-		throw error
+		throw error;
 	}
 }
