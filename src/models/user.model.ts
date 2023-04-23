@@ -22,6 +22,9 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 			unique: true,
 			required: true,
 		},
+		imageUrl: {
+			type: String,
+		},
 		calendar: {
 			type: String,
 		},

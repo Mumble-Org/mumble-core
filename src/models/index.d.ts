@@ -20,6 +20,7 @@ export interface I_UserDocument {
 	rate: number;
 	total_plays: number;
 	saved_beats: Array<Types.ObjectId>;
+	imageUrl: string;
 }
 
 /**

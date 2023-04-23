@@ -24,6 +24,9 @@ const UserSchema = new mongoose_1.default.Schema({
         unique: true,
         required: true,
     },
+    imageUrl: {
+        type: String,
+    },
     calendar: {
         type: String,
     },
@@ -75,7 +78,11 @@ const UserSchema = new mongoose_1.default.Schema({
     total_plays: {
         type: Number,
         default: 0
-    }
+    },
+    saved_beats: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "beat"
+        }]
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;
