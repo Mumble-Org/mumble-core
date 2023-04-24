@@ -51,10 +51,12 @@ const UserSchema = new mongoose_1.default.Schema({
         enum: ["producer", "artist", "engineer"],
         default: "producer",
     },
-    beats: [{
+    beats: [
+        {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'Beat'
-        }],
+            ref: "Beat",
+        },
+    ],
     beats_uploaded: {
         type: Number,
         default: 0,
@@ -77,12 +79,14 @@ const UserSchema = new mongoose_1.default.Schema({
     },
     total_plays: {
         type: Number,
-        default: 0
+        default: 0,
     },
-    saved_beats: [{
+    saved_beats: [
+        {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "beat"
-        }]
+            ref: "beat",
+        },
+    ],
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;

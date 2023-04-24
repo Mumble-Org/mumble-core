@@ -128,7 +128,7 @@ const getSoundEngineers = async (req, res) => {
         res.status(200).json({
             engineers,
             totalPages: Math.ceil(count / limit),
-            currentPage: page
+            currentPage: page,
         });
     }
     catch (err) {
@@ -183,8 +183,10 @@ const uploadProfileImage = async (req, res) => {
     try {
         const image = req.file;
         const key = `${req.body.id}-profile`;
-        const imgS3Object = await (0, s3bucket_util_1.uploadImage)(req.body.id, "profile-image", image, key);
-        const user = await user_model_1.default.findByIdAndUpdate(req.body.id, { imageUrl: imgS3Object.Location });
+        const imgS3Object = await (0, s3bucket_util_1.uploadImage)(image, key);
+        const user = await user_model_1.default.findByIdAndUpdate(req.body.id, {
+            imageUrl: imgS3Object.Location,
+        });
         if (user) {
             const signedUrl = (0, s3bucket_util_1.getSignedUrl)(user.imageUrl);
             res.status(203).json({ user, imageUrl: signedUrl });
@@ -207,7 +209,7 @@ const getProfileImage = async (req, res) => {
         const user = await user_model_1.default.findOne({ _id: req.body.id });
         if (user) {
             if (user.imageUrl && user.imageUrl != "") {
-                const signedUrl = (0, s3bucket_util_1.getSignedUrl)(user.imageUrl);
+                const signedUrl = (0, s3bucket_util_1.getSignedUrl)(`image-${req.body.id}-profile`);
                 return res.status(200).json({ user, imageUrl: signedUrl });
             }
             else {

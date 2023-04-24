@@ -56,7 +56,10 @@ async function login(user) {
                 expiresIn: "2 days",
             });
             userFound.password = "";
-            return { user: lodash_1.default.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]), token: token };
+            return {
+                user: lodash_1.default.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]),
+                token: token,
+            };
         }
         else {
             throw new Error("Password is not correct");
@@ -119,14 +122,14 @@ async function getProducers(page, limit, location) {
             producers = await user_model_1.default.find({ type: "producer", location: location })
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
-                .sort({ "total_plays": -1 })
+                .sort({ total_plays: -1 })
                 .exec();
         }
         else {
             producers = await user_model_1.default.find({ type: "producer" })
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
-                .sort({ "total_plays": -1 })
+                .sort({ total_plays: -1 })
                 .exec();
         }
         const count = await user_model_1.default.countDocuments();
@@ -134,7 +137,7 @@ async function getProducers(page, limit, location) {
             producer.password = "";
             producer.__v = "";
         });
-        return ({ producers, count });
+        return { producers, count };
     }
     catch (error) {
         throw error;
@@ -154,14 +157,14 @@ async function getEngineers(page, limit, location) {
             engineers = await user_model_1.default.find({ type: "engineer", location: location })
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
-                .sort({ "beats_sold": -1 })
+                .sort({ beats_sold: -1 })
                 .exec();
         }
         else {
             engineers = await user_model_1.default.find({ type: "engineer" })
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
-                .sort({ "beats_sold": -1 })
+                .sort({ beats_sold: -1 })
                 .exec();
         }
         const count = await user_model_1.default.countDocuments();
@@ -169,7 +172,7 @@ async function getEngineers(page, limit, location) {
             engineer.password = "";
             engineer.__v = "";
         });
-        return ({ engineers, count });
+        return { engineers, count };
     }
     catch (err) {
         throw err;
@@ -184,7 +187,9 @@ exports.getEngineers = getEngineers;
  */
 async function saveBeat(beat_id, user_id) {
     try {
-        const user = await user_model_1.default.findByIdAndUpdate(user_id, { saved_beats: beat_id });
+        const user = await user_model_1.default.findByIdAndUpdate(user_id, {
+            saved_beats: beat_id,
+        });
         return { user: lodash_1.default.omit(user.toObject(), ["__v", "password"]) };
     }
     catch (error) {

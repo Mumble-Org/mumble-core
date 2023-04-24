@@ -42,17 +42,15 @@ exports.downloadAudio = downloadAudio;
  * @param key key
  * @returns promise
  */
-const uploadAudio = (id, title, file, key) => {
+const uploadAudio = (file, key) => {
     try {
-        if (title != undefined && id) {
-            const params = {
-                Bucket: bucket,
-                Key: `audio-${key}`,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            };
-            return exports.s3Client.upload(params).promise();
-        }
+        const params = {
+            Bucket: bucket,
+            Key: `audio-${key}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+        return exports.s3Client.upload(params).promise();
     }
     catch (err) {
         console.log(err);
@@ -61,23 +59,19 @@ const uploadAudio = (id, title, file, key) => {
 exports.uploadAudio = uploadAudio;
 /**
  * upload image to s3 bucket
- * @param id user id
- * @param title beat title
  * @param file file to upload
  * @param key key
  * @returns promise
  */
-const uploadImage = (id, title, file, key) => {
+const uploadImage = (file, key) => {
     try {
-        if (title != undefined && id) {
-            const params = {
-                Bucket: bucket,
-                Key: `image-${key}`,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            };
-            return exports.s3Client.upload(params).promise();
-        }
+        const params = {
+            Bucket: bucket,
+            Key: `image-${key}`,
+            Body: file?.buffer,
+            ContentType: file.mimetype,
+        };
+        return exports.s3Client.upload(params).promise();
     }
     catch (err) {
         console.log(err);
@@ -86,23 +80,19 @@ const uploadImage = (id, title, file, key) => {
 exports.uploadImage = uploadImage;
 /**
  * upload beat data to s3 bucket
- * @param id user id
- * @param title beat title
  * @param file file to upload
  * @param key key
  * @returns promise
  */
-const uploadData = (id, title, file, key) => {
+const uploadData = (file, key) => {
     try {
-        if (title != undefined && id) {
-            const params = {
-                Bucket: bucket,
-                Key: `data-${key}`,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            };
-            return exports.s3Client.upload(params).promise();
-        }
+        const params = {
+            Bucket: bucket,
+            Key: `data-${key}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+        return exports.s3Client.upload(params).promise();
     }
     catch (err) {
         console.log(err);

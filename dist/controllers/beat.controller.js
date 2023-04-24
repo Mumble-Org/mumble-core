@@ -47,9 +47,9 @@ const uploadBeat = async (req, res) => {
         const AudioFile = file["audio"][0];
         const ImageFile = file["image"][0];
         const dataFile = file["data"][0];
-        const DataS3Promise = (0, s3bucket_util_1.uploadData)(id, title, dataFile, key);
-        const AudioS3Promise = (0, s3bucket_util_1.uploadAudio)(id, title, AudioFile, key);
-        const ImageS3Promise = (0, s3bucket_util_1.uploadImage)(id, title, ImageFile, key);
+        const DataS3Promise = (0, s3bucket_util_1.uploadData)(dataFile, key);
+        const AudioS3Promise = (0, s3bucket_util_1.uploadAudio)(AudioFile, key);
+        const ImageS3Promise = (0, s3bucket_util_1.uploadImage)(ImageFile, key);
         const ImageS3Object = await ImageS3Promise;
         const AudioS3Object = await AudioS3Promise;
         const DataS3Object = await DataS3Promise;
