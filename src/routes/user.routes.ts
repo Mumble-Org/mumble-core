@@ -11,7 +11,7 @@ router.post("/signup", userController.signup);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
 router.get("/trendingProducers", userController.getTrendingProducers);
-router.get("/engineers", userController.getSoundEngineers);
+router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
 router.get("/profile", auth, userController.getProfileImage);
 router.put("/save", auth, userController.SavedBeats);
 router.put(

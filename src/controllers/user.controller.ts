@@ -93,7 +93,7 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
  * @param req
  * @param res
  */
-export const getSoundEngineers = async (req: Request, res: Response) => {
+export const getTrendingSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;

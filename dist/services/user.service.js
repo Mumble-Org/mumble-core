@@ -9,6 +9,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("../middlewares/auth");
 const lodash_1 = __importDefault(require("lodash"));
+const s3bucket_util_1 = require("../utils/s3bucket.util");
 async function register(user) {
     try {
         const newUser = await user_model_1.default.create(user);
@@ -133,7 +134,10 @@ async function getProducers(page, limit, location) {
                 .exec();
         }
         const count = await user_model_1.default.countDocuments();
-        producers.forEach((producer) => {
+        producers.forEach(async (producer) => {
+            producer.imageUrl === "" || producer.imageUrl === undefined
+                ? (producer.imageUrl = "")
+                : (producer.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${producer._id.toString()}-profile`));
             producer.password = "";
             producer.__v = "";
         });
@@ -168,7 +172,10 @@ async function getEngineers(page, limit, location) {
                 .exec();
         }
         const count = await user_model_1.default.countDocuments();
-        engineers.forEach((engineer) => {
+        engineers.forEach(async (engineer) => {
+            engineer.imageUrl === "" || engineer.imageUrl === undefined
+                ? (engineer.imageUrl = "")
+                : (engineer.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${engineer._id.toString()}-profile`));
             engineer.password = "";
             engineer.__v = "";
         });

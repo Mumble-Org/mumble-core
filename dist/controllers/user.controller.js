@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
+exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
 const errors_util_1 = require("../utils/errors.util");
 // import upload from "../utils/s3bucket.utils";
 const userServices = __importStar(require("../services/user.service"));
@@ -119,7 +119,7 @@ exports.getTrendingProducers = getTrendingProducers;
  * @param req
  * @param res
  */
-const getSoundEngineers = async (req, res) => {
+const getTrendingSoundEngineers = async (req, res) => {
     try {
         const page = parseInt(req.query?.page) || 1;
         const limit = parseInt(req.query?.limit) || 24;
@@ -136,7 +136,7 @@ const getSoundEngineers = async (req, res) => {
         res.status(500).send("Internal Server Error!");
     }
 };
-exports.getSoundEngineers = getSoundEngineers;
+exports.getTrendingSoundEngineers = getTrendingSoundEngineers;
 /**
  * Save beat added by user to database
  * @param req
