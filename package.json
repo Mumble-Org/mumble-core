@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --fix",
     "run-typescript": "ts-node src/main.ts",
-    "build": "tsc",
+    "build": "concurrently \"npx tsc --watch\" \"nodemon -q dist/main.js\"",
     "start": "node dist/main.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/main.js\""
   },
