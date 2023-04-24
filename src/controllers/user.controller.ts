@@ -5,7 +5,6 @@ import * as userServices from "../services/user.service";
 import { getSignedUrl, uploadImage } from "../utils/s3bucket.util";
 import UserModel from "../models/user.model";
 
-
 /**
  * Logs in a user
  */
@@ -14,12 +13,11 @@ export const login = async (req: Request, res: Response) => {
 		const user = await userServices.login(req.body);
 		res.cookie("Authorization", `Bearer ${user.token}`);
 		res.set("Authorization", `Bearer ${user.token}`);
-		res.status(200).json({user});
+		res.status(200).json({ user });
 	} catch (error) {
 		return res.status(500).send(getErrorMessage(error));
 	}
 };
-
 
 /**
  * Signs up a user
@@ -36,7 +34,6 @@ export const signup = async (req: Request, res: Response) => {
 	}
 };
 
-
 /**
  * Confirms username input doesn't exist in the database
  */
@@ -49,7 +46,6 @@ export const confirmUsername = async (req: Request, res: Response) => {
 		return res.status(500).send(getErrorMessage(error));
 	}
 };
-
 
 /**
  * Confirms email input doesn't exist in the database
@@ -64,19 +60,22 @@ export const confirmEmail = async (req: Request, res: Response) => {
 	}
 };
 
-
 /**
  * Responds with trending prodcers
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 export const getTrendingProducers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
-		const location = req.query.location as string || "";
+		const location = (req.query.location as string) || "";
 
-		const { producers, count } = await userServices.getProducers(page, limit, location);
+		const { producers, count } = await userServices.getProducers(
+			page,
+			limit,
+			location
+		);
 
 		res.status(200).json({
 			producers,
@@ -87,50 +86,53 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error!");
 	}
-}
-
+};
 
 /**
  * Responds with popular sound Engineers
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 export const getSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
-		const location = req.query.location as string || "";
+		const location = (req.query.location as string) || "";
 
-		const {engineers, count} = await userServices.getEngineers(page, limit, location);
+		const { engineers, count } = await userServices.getEngineers(
+			page,
+			limit,
+			location
+		);
 
 		res.status(200).json({
 			engineers,
 			totalPages: Math.ceil(count / limit),
-			currentPage: page
-		})
+			currentPage: page,
+		});
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error!");
 	}
-}
+};
 
 /**
  * Save beat added by user to database
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  * @returns user and message
  */
 export const SavedBeats = async (req: Request, res: Response) => {
 	try {
-		const {beat_id, id} = req.body;
+		const { beat_id, id } = req.body;
 		const user = await userServices.saveBeat(beat_id, id);
 
-		return res.status(200).json({user, msg: "Beat saved"});
+		return res.status(200).json({ user, msg: "Beat saved" });
 	} catch (error) {
 		console.log(getErrorMessage(error));
 		res.status(500).send("Internal Server Error");
 	}
-}
+};
 
 
 /**
@@ -162,41 +164,42 @@ export const uploadProfileImage = async (req: Request, res: Response) => {
 	try {
 		const image = req.file;
 		const key = `${req.body.id}-profile`;
-		const imgS3Object = await uploadImage(req.body.id, "profile-image", image, key);
+		const imgS3Object = await uploadImage(image, key);
 
-		const user = await UserModel.findByIdAndUpdate(req.body.id, {imageUrl: imgS3Object.Location});
+		const user = await UserModel.findByIdAndUpdate(req.body.id, {
+			imageUrl: imgS3Object.Location,
+		});
 		if (user) {
 			const signedUrl = getSignedUrl(user.imageUrl);
-			res.status(203).json({user, imageUrl: signedUrl});
+			res.status(203).json({ user, imageUrl: signedUrl });
 		}
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error");
 	}
-}
+};
 
 /**
  * get user details and signedUrl for profile image
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  * @returns HTTP response
  */
 export const getProfileImage = async (req: Request, res: Response) => {
 	try {
-		const user = await UserModel.findOne({_id: req.body.id});
+		const user = await UserModel.findOne({ _id: req.body.id });
 		if (user) {
 			if (user.imageUrl && user.imageUrl != "") {
-				const signedUrl = getSignedUrl(user.imageUrl);
-				return res.status(200).json({user, imageUrl: signedUrl});
+				const signedUrl = getSignedUrl(`image-${user._id}-profile`);
+				return res.status(200).json({ user, imageUrl: signedUrl });
 			} else {
-				return res.status(200).json({user, imageUrl: null});
+				return res.status(200).json({ user, imageUrl: null });
 			}
 		} else {
-			return res.status(400).json({msg: "User Not found!"});
+			return res.status(400).json({ msg: "User Not found!" });
 		}
 	} catch (error) {
 		console.log(getErrorMessage(error));
 		res.status(500).send("Internal Server Error");
 	}
-}
-
+};

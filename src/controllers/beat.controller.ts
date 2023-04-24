@@ -12,7 +12,6 @@ import _ from "lodash";
 import { fileRequest } from ".";
 import * as beatServices from "../services/beat.services";
 import UserModel from "../models/user.model";
-import { I_UserDocument } from "../models";
 
 /**
  * Define upload route's controller
@@ -28,9 +27,9 @@ export const uploadBeat = async (req: fileRequest, res: Response) => {
 		const AudioFile = file["audio"][0];
 		const ImageFile = file["image"][0];
 		const dataFile = file["data"][0];
-		const DataS3Promise = uploadData(id, title, dataFile, key);
-		const AudioS3Promise = uploadAudio(id, title, AudioFile, key);
-		const ImageS3Promise = uploadImage(id, title, ImageFile, key);
+		const DataS3Promise = uploadData(dataFile, key);
+		const AudioS3Promise = uploadAudio(AudioFile, key);
+		const ImageS3Promise = uploadImage(ImageFile, key);
 
 		const ImageS3Object = await ImageS3Promise;
 		const AudioS3Object = await AudioS3Promise;
