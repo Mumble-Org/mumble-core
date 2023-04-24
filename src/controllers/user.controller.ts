@@ -132,6 +132,26 @@ export const SavedBeats = async (req: Request, res: Response) => {
 	}
 }
 
+
+/**
+ * Remove beat from user's list of saved beats
+ * @param req 
+ * @param res 
+ * @returns HTTP RESPONSE
+ */
+export const RemoveSavedBeat = async (req: Request, res: Response) => {
+	try {
+		const {beat_id, id} = req.body;
+		const user = await userServices.removeSavedBeat(beat_id, id);
+
+		return res.status(200).json({user, msg: "Beat Removed"});
+	} catch (error) {
+		console.log(getErrorMessage(error));
+		res.status(500).send("Internal Server Error");
+		
+	}
+}
+
 /**
  * upload profile image and update url to image in the database
  * @params req

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.saveBeat = exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -192,3 +192,23 @@ async function saveBeat(beat_id, user_id) {
     }
 }
 exports.saveBeat = saveBeat;
+/**
+ * Remove beat from list of saved beat in database
+ * @param beat_id
+ * @param user_id
+ * @returns User object
+ */
+async function removeSavedBeat(beat_id, user_id) {
+    try {
+        const user = await user_model_1.default.findById(user_id);
+        user.saved_beats.filter((beat) => {
+            beat.toString() != beat_id;
+        });
+        user.save();
+        return { user: lodash_1.default.omit(user.toObject(), ["__v", "password"]) };
+    }
+    catch (error) {
+        throw error;
+    }
+}
+exports.removeSavedBeat = removeSavedBeat;

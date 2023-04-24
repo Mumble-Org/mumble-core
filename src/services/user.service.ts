@@ -197,3 +197,24 @@ export async function saveBeat(beat_id: string, user_id: string) {
 		throw error
 	}
 }
+
+/**
+ * Remove beat from list of saved beat in database
+ * @param beat_id 
+ * @param user_id 
+ * @returns User object
+ */
+export async function removeSavedBeat(beat_id: string, user_id: string) {
+	try {
+		const user = await UserModel.findById(user_id);
+		user.saved_beats.filter((beat) => {
+			beat.toString() != beat_id
+		})
+
+		user.save();
+
+		return {user: _.omit(user.toObject(), ["__v", "password"])};
+	} catch (error) {
+		throw error;
+	}
+}
