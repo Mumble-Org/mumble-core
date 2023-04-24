@@ -17,11 +17,15 @@ async function getBeatDetails(beat) {
     // get audio from s3 bucket
     const audioKey = `audio-${beat.key}`;
     const imageKey = `image-${beat.key}`;
+    const profileKey = `image-${beat.user_id}-profile`;
     const audioSignedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
     const imageSignedUrl = (0, s3bucket_util_1.getSignedUrl)(imageKey);
+    const profileSignedUrl = (0, s3bucket_util_1.getSignedUrl)(profileKey);
     const { __v, ...beatObj } = beat;
-    // await producer promise
-    const producer = await producerPromise;
+    // await producer image promise
+    const producer = (await producerPromise).toObject();
+    producer.imageUrl =
+        producer.imageUrl && producer.imageUrl != "" ? profileSignedUrl : "";
     const ret = { ...beatObj, audioSignedUrl, imageSignedUrl, producer };
     return ret;
 }
@@ -37,18 +41,18 @@ function getSortOrder(price) {
         case "Lowest first":
             order = {
                 price: 1,
-                plays: "desc"
+                plays: "desc",
             };
             break;
         case "Highest first":
             order = {
                 price: -1,
-                plays: "desc"
+                plays: "desc",
             };
             break;
         default:
             order = {
-                plays: "desc"
+                plays: "desc",
             };
             break;
     }
@@ -67,14 +71,14 @@ function getFindObject(genre, date) {
             return {
                 createdAt: {
                     $gt: date,
-                }
+                },
             };
         default:
             return {
                 createdAt: {
                     $gt: date,
                 },
-                genre
+                genre,
             };
     }
 }
