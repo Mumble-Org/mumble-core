@@ -22,9 +22,13 @@ export async function register(user: HydratedDocument<I_UserDocument>) {
 					expiresIn: "2 days",
 				}
 			);
-			newUser.password = "";
 			return {
-				user: _.omit(newUser.toObject(), ["createdAt", "updatedAt", "__v"]),
+				user: _.omit(newUser.toObject(), [
+					"createdAt",
+					"updatedAt",
+					"__v",
+					"password",
+				]),
 				token: token,
 			};
 		}
