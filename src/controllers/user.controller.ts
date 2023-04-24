@@ -170,7 +170,7 @@ export const getProfileImage = async (req: Request, res: Response) => {
 		const user = await UserModel.findOne({ _id: req.body.id });
 		if (user) {
 			if (user.imageUrl && user.imageUrl != "") {
-				const signedUrl = getSignedUrl(user.imageUrl);
+				const signedUrl = getSignedUrl(`image-${user._id}-profile`);
 				return res.status(200).json({ user, imageUrl: signedUrl });
 			} else {
 				return res.status(200).json({ user, imageUrl: null });
