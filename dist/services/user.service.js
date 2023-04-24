@@ -56,9 +56,17 @@ async function login(user) {
             const token = jsonwebtoken_1.default.sign({ _id: userFound._id?.toString(), name: userFound.name }, auth_1.SECRET_KEY, {
                 expiresIn: "2 days",
             });
-            userFound.password = "";
+            // Get profile picture
+            userFound.imageUrl && userFound.imageUrl != ""
+                ? (userFound.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${userFound._id.toString()}-profile`))
+                : "";
             return {
-                user: lodash_1.default.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]),
+                user: lodash_1.default.omit(userFound.toObject(), [
+                    "createdAt",
+                    "updatedAt",
+                    "__v",
+                    "password",
+                ]),
                 token: token,
             };
         }
