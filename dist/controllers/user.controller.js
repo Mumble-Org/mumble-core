@@ -40,7 +40,7 @@ const login = async (req, res) => {
         const user = await userServices.login(req.body);
         res.cookie("Authorization", `Bearer ${user.token}`);
         res.set("Authorization", `Bearer ${user.token}`);
-        res.status(200).json({ user });
+        res.status(200).json(user);
     }
     catch (error) {
         return res.status(500).send((0, errors_util_1.getErrorMessage)(error));

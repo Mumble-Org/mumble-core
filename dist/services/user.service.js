@@ -20,9 +20,13 @@ async function register(user) {
             const token = jsonwebtoken_1.default.sign({ _id: newUser._id?.toString(), name: newUser.name }, auth_1.SECRET_KEY, {
                 expiresIn: "2 days",
             });
-            newUser.password = "";
             return {
-                user: lodash_1.default.omit(newUser.toObject(), ["createdAt", "updatedAt", "__v"]),
+                user: lodash_1.default.omit(newUser.toObject(), [
+                    "createdAt",
+                    "updatedAt",
+                    "__v",
+                    "password",
+                ]),
                 token: token,
             };
         }

@@ -119,7 +119,7 @@ const getSignedUrl = (key) => {
     const params = {
         Bucket: bucket,
         Key: key,
-        Expires: 3600,
+        Expires: 60 * 60 * 24 * 2,
     };
     return exports.s3Client.getSignedUrl("getObject", params);
 };
