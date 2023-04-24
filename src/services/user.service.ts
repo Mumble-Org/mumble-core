@@ -64,9 +64,21 @@ export async function login(user: HydratedDocument<I_UserDocument>) {
 					expiresIn: "2 days",
 				}
 			);
-			userFound.password = "";
+
+			// Get profile picture
+			userFound.imageUrl && userFound.imageUrl != ""
+				? (userFound.imageUrl = await getSignedUrl(
+						`image-${userFound._id.toString()}-profile`
+				  ))
+				: "";
+
 			return {
-				user: _.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]),
+				user: _.omit(userFound.toObject(), [
+					"createdAt",
+					"updatedAt",
+					"__v",
+					"password",
+				]),
 				token: token,
 			};
 		} else {
