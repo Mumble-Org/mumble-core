@@ -208,7 +208,7 @@ export const getProfileImage = async (req: Request, res: Response) => {
 export const getUserWithName = async (req: Request, res: Response) => {
 	try {
 		const { name } = req.body;
-		const user = await userServices.getUser(name);
+		const user = await userServices.getUser(name?.toLowerCase());
 		if (user) {
 			return res.status(200).json({ user });
 		} else {
