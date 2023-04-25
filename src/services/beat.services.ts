@@ -14,14 +14,18 @@ export async function getBeatDetails(beat: Beat) {
 	// get audio from s3 bucket
 	const audioKey = `audio-${beat.key}`;
 	const imageKey = `image-${beat.key}`;
+	const profileKey = `image-${beat.user_id}-profile`;
 
 	const audioSignedUrl = getSignedUrl(audioKey);
 	const imageSignedUrl = getSignedUrl(imageKey);
+	const profileSignedUrl = getSignedUrl(profileKey);
 
 	const { __v, ...beatObj } = beat;
 
-	// await producer promise
-	const producer = await producerPromise;
+	// await producer image promise
+	const producer = (await producerPromise).toObject();
+	producer.imageUrl =
+		producer.imageUrl && producer.imageUrl != "" ? profileSignedUrl : "";
 
 	const ret = { ...beatObj, audioSignedUrl, imageSignedUrl, producer };
 
@@ -40,18 +44,18 @@ export function getSortOrder(price: string) {
 		case "Lowest first":
 			order = {
 				price: 1,
-				plays: "desc"
+				plays: "desc",
 			};
 			break;
 		case "Highest first":
 			order = {
 				price: -1,
-				plays: "desc"
+				plays: "desc",
 			};
 			break;
 		default:
 			order = {
-				plays: "desc"
+				plays: "desc",
 			};
 			break;
 	}
@@ -61,9 +65,9 @@ export function getSortOrder(price: string) {
 
 /**
  * Add genre query if provided
- * @param genre 
- * @param date 
- * @returns 
+ * @param genre
+ * @param date
+ * @returns
  */
 export function getFindObject(genre: string, date: Date) {
 	switch (genre) {
@@ -71,14 +75,14 @@ export function getFindObject(genre: string, date: Date) {
 			return {
 				createdAt: {
 					$gt: date,
-				}
+				},
 			};
 		default:
 			return {
 				createdAt: {
 					$gt: date,
 				},
-				genre
-			}
+				genre,
+			};
 	}
 }

@@ -5,8 +5,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../middlewares/auth";
 import _ from "lodash";
+<<<<<<< HEAD
 import mongoose from "mongoose";
 import { getErrorMessage } from "../utils/errors.util";
+=======
+import { getSignedUrl } from "../utils/s3bucket.util";
+>>>>>>> e8c54ed4cef5f8cefa49b76fc23efb9baf1d238a
 
 export async function register(user: HydratedDocument<I_UserDocument>) {
 	try {
@@ -23,9 +27,13 @@ export async function register(user: HydratedDocument<I_UserDocument>) {
 					expiresIn: "2 days",
 				}
 			);
-			newUser.password = "";
 			return {
-				user: _.omit(newUser.toObject(), ["createdAt", "updatedAt", "__v"]),
+				user: _.omit(newUser.toObject(), [
+					"createdAt",
+					"updatedAt",
+					"__v",
+					"password",
+				]),
 				token: token,
 			};
 		}
@@ -65,9 +73,21 @@ export async function login(user: HydratedDocument<I_UserDocument>) {
 					expiresIn: "2 days",
 				}
 			);
-			userFound.password = "";
+
+			// Get profile picture
+			userFound.imageUrl && userFound.imageUrl != ""
+				? (userFound.imageUrl = await getSignedUrl(
+						`image-${userFound._id.toString()}-profile`
+				  ))
+				: "";
+
 			return {
-				user: _.omit(userFound.toObject(), ["createdAt", "updatedAt", "__v"]),
+				user: _.omit(userFound.toObject(), [
+					"createdAt",
+					"updatedAt",
+					"__v",
+					"password",
+				]),
 				token: token,
 			};
 		} else {
@@ -154,7 +174,12 @@ export async function getProducers(
 		}
 		const count = await UserModel.countDocuments();
 
-		producers.forEach((producer) => {
+		producers.forEach(async (producer) => {
+			producer.imageUrl === "" || producer.imageUrl === undefined
+				? (producer.imageUrl = "")
+				: (producer.imageUrl = await getSignedUrl(
+						`image-${producer._id.toString()}-profile`
+				  ));
 			producer.password = "";
 			producer.__v = "";
 		});
@@ -194,7 +219,12 @@ export async function getEngineers(
 
 		const count = await UserModel.countDocuments();
 
-		engineers.forEach((engineer) => {
+		engineers.forEach(async (engineer) => {
+			engineer.imageUrl === "" || engineer.imageUrl === undefined
+				? (engineer.imageUrl = "")
+				: (engineer.imageUrl = await getSignedUrl(
+						`image-${engineer._id.toString()}-profile`
+				  ));
 			engineer.password = "";
 			engineer.__v = "";
 		});
@@ -226,20 +256,20 @@ export async function saveBeat(beat_id: string, user_id: string) {
 
 /**
  * Remove beat from list of saved beat in database
- * @param beat_id 
- * @param user_id 
+ * @param beat_id
+ * @param user_id
  * @returns User object
  */
 export async function removeSavedBeat(beat_id: string, user_id: string) {
 	try {
 		const user = await UserModel.findById(user_id);
 		user.saved_beats.filter((beat) => {
-			beat.toString() != beat_id
-		})
+			beat.toString() != beat_id;
+		});
 
 		user.save();
 
-		return {user: _.omit(user.toObject(), ["__v", "password"])};
+		return { user: _.omit(user.toObject(), ["__v", "password"]) };
 	} catch (error) {
 		throw error;
 	}

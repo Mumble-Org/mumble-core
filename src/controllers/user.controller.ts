@@ -13,7 +13,7 @@ export const login = async (req: Request, res: Response) => {
 		const user = await userServices.login(req.body);
 		res.cookie("Authorization", `Bearer ${user.token}`);
 		res.set("Authorization", `Bearer ${user.token}`);
-		res.status(200).json({ user });
+		res.status(200).json(user);
 	} catch (error) {
 		return res.status(500).send(getErrorMessage(error));
 	}
@@ -93,7 +93,7 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
  * @param req
  * @param res
  */
-export const getSoundEngineers = async (req: Request, res: Response) => {
+export const getTrendingSoundEngineers = async (req: Request, res: Response) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
