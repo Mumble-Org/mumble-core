@@ -51,8 +51,7 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 		},
 		beats: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "Beat",
+				type: String,
 			},
 		],
 		beats_uploaded: {

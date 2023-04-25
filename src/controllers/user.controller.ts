@@ -143,14 +143,14 @@ export const SavedBeats = async (req: Request, res: Response) => {
  */
 export const RemoveSavedBeat = async (req: Request, res: Response) => {
 	try {
-		const {beat_id, id} = req.body;
+		const { beat_id, id } = req.body;
 		const user = await userServices.removeSavedBeat(beat_id, id);
 
-		return res.status(200).json({user, msg: "Beat Removed"});
+		return res.status(200).json({ user, msg: "Beat Removed" });
 	} catch (error) {
 		console.log(getErrorMessage(error));
 		res.status(500).send("Internal Server Error");
-		
+
 	}
 }
 
@@ -203,3 +203,19 @@ export const getProfileImage = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
+
+
+export const getUserWithName = async (req: Request, res: Response) => {
+	try {
+		const { name } = req.body;
+		const user = await userServices.getUser(name);
+		if (user) {
+			return res.status(200).json({ user });
+		} else {
+			return res.status(404).json({ msg: "user not found!" });
+		}
+	} catch (error) {
+		console.log(getErrorMessage(error));
+		res.status(500).send("Internal Server Error");
+	}
+}

@@ -10,6 +10,7 @@ router.post("/login", userController.login);
 router.post("/signup", userController.signup);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
+router.post("/user", userController.getUserWithName);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/engineers", userController.getSoundEngineers);
 router.get("/profile", auth, userController.getProfileImage);
@@ -19,5 +20,6 @@ router.put(
 	[upload.single("image"), auth],
 	userController.uploadProfileImage
 );
+router.delete("/savedBeat", auth, userController.RemoveSavedBeat);
 
 export default router;

@@ -41,4 +41,5 @@ router.get("/engineers", userController.getSoundEngineers);
 router.get("/profile", auth_1.default, userController.getProfileImage);
 router.put("/save", auth_1.default, userController.SavedBeats);
 router.put("/profileImage", [upload_middleware_1.default.single("image"), auth_1.default], userController.uploadProfileImage);
+router.delete("/savedBeat", auth_1.default, userController.RemoveSavedBeat);
 exports.default = router;

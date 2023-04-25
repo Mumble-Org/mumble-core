@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.getUser = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -110,6 +110,21 @@ async function checkEmail(user) {
 }
 exports.checkEmail = checkEmail;
 /**
+ * Get user with username from database
+ * @param username
+ * @returns
+ */
+async function getUser(username) {
+    try {
+        const user = await user_model_1.default.findOne({ name: username });
+        return user;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+exports.getUser = getUser;
+/**
  * get trending producers from the database
  * @param page
  * @param limit
@@ -187,9 +202,9 @@ exports.getEngineers = getEngineers;
  */
 async function saveBeat(beat_id, user_id) {
     try {
-        const user = await user_model_1.default.findByIdAndUpdate(user_id, {
-            saved_beats: beat_id,
-        });
+        const user = await user_model_1.default.findById(user_id);
+        user.saved_beats.push(beat_id);
+        user.save();
         return { user: lodash_1.default.omit(user.toObject(), ["__v", "password"]) };
     }
     catch (error) {

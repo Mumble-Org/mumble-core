@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../middlewares/auth";
 import _ from "lodash";
+import mongoose from "mongoose";
+import { getErrorMessage } from "../utils/errors.util";
 
 export async function register(user: HydratedDocument<I_UserDocument>) {
 	try {
@@ -112,6 +114,19 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 }
 
 /**
+ * Get user with username from database
+ * @param username 
+ * @returns 
+ */
+export async function getUser(username: string) {
+	try {
+		const user = await UserModel.findOne({name: username});
+		return user;
+	} catch (error) {
+		throw error;
+	}
+}
+/**
  * get trending producers from the database
  * @param page
  * @param limit
@@ -198,15 +213,16 @@ export async function getEngineers(
  */
 export async function saveBeat(beat_id: string, user_id: string) {
 	try {
-		const user = await UserModel.findByIdAndUpdate(user_id, {
-			saved_beats: beat_id,
-		});
+		const user = await UserModel.findById(user_id);
+		user.saved_beats.push(beat_id);
+		user.save();
 
 		return { user: _.omit(user.toObject(), ["__v", "password"]) };
 	} catch (error) {
 		throw error;
 	}
 }
+
 
 /**
  * Remove beat from list of saved beat in database
