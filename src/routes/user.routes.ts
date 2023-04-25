@@ -10,7 +10,7 @@ router.post("/login", userController.login);
 router.post("/signup", userController.signup);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
-router.post("/name", userController.getUserWithName);
+router.post("/", userController.getUserWithName);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
 router.get("/profile", auth, userController.getProfileImage);

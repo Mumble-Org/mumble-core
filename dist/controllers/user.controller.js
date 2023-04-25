@@ -26,8 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserWithName = exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
-exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
+exports.getUserWithName = exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
 const errors_util_1 = require("../utils/errors.util");
 // import upload from "../utils/s3bucket.utils";
 const userServices = __importStar(require("../services/user.service"));
@@ -230,12 +229,17 @@ exports.getProfileImage = getProfileImage;
 const getUserWithName = async (req, res) => {
     try {
         const { name } = req.body;
-        const user = await userServices.getUser(name);
+        const user = await userServices.getUser(name?.toLowerCase());
         if (user) {
             return res.status(200).json({ user });
         }
+        else {
+            return res.status(404).json({ msg: "user not found!" });
+        }
     }
-    finally {
+    catch (error) {
+        console.log((0, errors_util_1.getErrorMessage)(error));
+        res.status(500).send("Internal Server Error");
     }
 };
 exports.getUserWithName = getUserWithName;

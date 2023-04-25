@@ -36,6 +36,7 @@ router.post("/login", userController.login);
 router.post("/signup", userController.signup);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
+router.post("/", userController.getUserWithName);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
 router.get("/profile", auth_1.default, userController.getProfileImage);
