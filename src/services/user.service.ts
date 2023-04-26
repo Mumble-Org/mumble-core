@@ -137,7 +137,7 @@ export async function getUser(username: string) {
 	try {
 		const user = (await UserModel.findOne({ name: username }))?.toObject();
 		
-		if (user && user.imageUrl != "") {
+		if (user && user.imageUrl) {
 			user.imageUrl = await getSignedUrl(`image-${user._id.toString()}-profile`);
 		}
 		return user;
