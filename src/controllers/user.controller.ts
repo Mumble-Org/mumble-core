@@ -210,7 +210,7 @@ export const getUserWithName = async (req: Request, res: Response) => {
 		const { name } = req.body;
 		const user = await userServices.getUser(name?.toLowerCase());
 		if (user) {
-			return res.status(200).json({ user });
+			return res.status(200).json(user);
 		} else {
 			return res.status(404).json({ msg: "user not found!" });
 		}
