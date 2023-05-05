@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserWithName = exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.signup = exports.login = void 0;
+exports.getUserWithName = exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.update = exports.signup = exports.login = void 0;
 const errors_util_1 = require("../utils/errors.util");
 // import upload from "../utils/s3bucket.utils";
 const userServices = __importStar(require("../services/user.service"));
@@ -63,6 +63,20 @@ const signup = async (req, res) => {
     }
 };
 exports.signup = signup;
+/**
+ * Updates a user
+ */
+const update = async (req, res) => {
+    try {
+        const body = await userServices.parseUser(req.body);
+        const user = await userServices.updateUser(body);
+        res.status(200).json(user);
+    }
+    catch (error) {
+        return res.status(500).send((0, errors_util_1.getErrorMessage)(error));
+    }
+};
+exports.update = update;
 /**
  * Confirms username input doesn't exist in the database
  */

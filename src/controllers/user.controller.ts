@@ -35,6 +35,19 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 /**
+ * Updates a user
+ */
+export const update = async (req: Request, res: Response) => {
+	try {
+		const body = await userServices.parseUser(req.body);
+		const user = await userServices.updateUser(body);
+		res.status(200).json(user);
+	} catch (error) {
+		return res.status(500).send(getErrorMessage(error));
+	}
+};
+
+/**
  * Confirms username input doesn't exist in the database
  */
 export const confirmUsername = async (req: Request, res: Response) => {
