@@ -3,12 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.getUser = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.register = void 0;
+exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.getUser = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.updateUser = exports.register = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("../middlewares/auth");
 const lodash_1 = __importDefault(require("lodash"));
+const s3bucket_util_1 = require("../utils/s3bucket.util");
+/**
+ * Create user
+ * @param user
+ * @returns
+ */
 async function register(user) {
     try {
         const newUser = await user_model_1.default.create(user);
@@ -36,13 +42,27 @@ async function register(user) {
 }
 exports.register = register;
 /**
+ * Update user profile
+ * @param body
+ */
+async function updateUser(body) {
+    // Get user
+    let user = await user_model_1.default.findById(body.id);
+    if (!user)
+        throw new Error("User not found");
+    // Update user
+    await user_model_1.default.updateOne({ _id: body.id }, body);
+    user = await user_model_1.default.findById(body.id);
+    return lodash_1.default.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
+}
+exports.updateUser = updateUser;
+/**
  * Convert fields to lowercase
  */
 async function parseUser(user) {
     user.name = user.name?.toLowerCase();
     user.email = user.email?.toLowerCase();
     user.genres = user.genres?.map((genre) => genre.toLowerCase());
-    user.portfolio = user.portfolio?.map((link) => link.toLowerCase());
     return user;
 }
 exports.parseUser = parseUser;
@@ -61,7 +81,7 @@ async function login(user) {
             });
             // Get profile picture
             userFound.imageUrl && userFound.imageUrl != ""
-                ? (userFound.imageUrl = await getSignedUrl(`image-${userFound._id.toString()}-profile`))
+                ? (userFound.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${userFound._id.toString()}-profile`))
                 : "";
             return {
                 user: lodash_1.default.omit(userFound.toObject(), [
@@ -128,7 +148,10 @@ exports.checkEmail = checkEmail;
  */
 async function getUser(username) {
     try {
-        const user = await user_model_1.default.findOne({ name: username });
+        const user = (await user_model_1.default.findOne({ name: username }))?.toObject();
+        if (user && user.imageUrl) {
+            user.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${user._id.toString()}-profile`);
+        }
         return user;
     }
     catch (error) {
@@ -163,7 +186,7 @@ async function getProducers(page, limit, location) {
         producers.forEach(async (producer) => {
             producer.imageUrl === "" || producer.imageUrl === undefined
                 ? (producer.imageUrl = "")
-                : (producer.imageUrl = await getSignedUrl(`image-${producer._id.toString()}-profile`));
+                : (producer.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${producer._id.toString()}-profile`));
             producer.password = "";
             producer.__v = "";
         });
@@ -201,7 +224,7 @@ async function getEngineers(page, limit, location) {
         engineers.forEach(async (engineer) => {
             engineer.imageUrl === "" || engineer.imageUrl === undefined
                 ? (engineer.imageUrl = "")
-                : (engineer.imageUrl = await getSignedUrl(`image-${engineer._id.toString()}-profile`));
+                : (engineer.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${engineer._id.toString()}-profile`));
             engineer.password = "";
             engineer.__v = "";
         });

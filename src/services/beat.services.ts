@@ -23,7 +23,7 @@ export async function getBeatDetails(beat: Beat) {
 	const { __v, ...beatObj } = beat;
 
 	// await producer image promise
-	const producer = (await producerPromise).toObject();
+	const	producer = (await producerPromise).toObject();
 	producer.imageUrl =
 		producer.imageUrl && producer.imageUrl != "" ? profileSignedUrl : "";
 

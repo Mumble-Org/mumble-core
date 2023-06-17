@@ -7,6 +7,11 @@ import { SECRET_KEY } from "../middlewares/auth";
 import _ from "lodash";
 import { getSignedUrl } from "../utils/s3bucket.util";
 
+/**
+ * Create user
+ * @param user
+ * @returns
+ */
 export async function register(user: HydratedDocument<I_UserDocument>) {
 	try {
 		const newUser = await UserModel.create(user);
@@ -38,13 +43,29 @@ export async function register(user: HydratedDocument<I_UserDocument>) {
 }
 
 /**
+ * Update user profile
+ * @param body
+ */
+export async function updateUser(body: HydratedDocument<I_UserDocument>) {
+	// Get user
+	let user = await UserModel.findById(body.id);
+
+	if (!user) throw new Error("User not found");
+
+	// Update user
+	await UserModel.updateOne({ _id: body.id }, body);
+	user = await UserModel.findById(body.id);
+
+	return _.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
+}
+
+/**
  * Convert fields to lowercase
  */
 export async function parseUser(user: HydratedDocument<I_UserDocument>) {
 	user.name = user.name?.toLowerCase();
 	user.email = user.email?.toLowerCase();
 	user.genres = user.genres?.map((genre: string) => genre.toLowerCase());
-	user.portfolio = user.portfolio?.map((link: string) => link.toLowerCase());
 	return user;
 }
 
@@ -130,12 +151,18 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 
 /**
  * Get user with username from database
- * @param username 
- * @returns 
+ * @param username
+ * @returns
  */
 export async function getUser(username: string) {
 	try {
-		const user = await UserModel.findOne({name: username});
+		const user = (await UserModel.findOne({ name: username }))?.toObject();
+
+		if (user && user.imageUrl) {
+			user.imageUrl = await getSignedUrl(
+				`image-${user._id.toString()}-profile`
+			);
+		}
 		return user;
 	} catch (error) {
 		throw error;
@@ -247,7 +274,6 @@ export async function saveBeat(beat_id: string, user_id: string) {
 		throw error;
 	}
 }
-
 
 /**
  * Remove beat from list of saved beat in database

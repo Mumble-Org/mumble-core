@@ -34,6 +34,7 @@ const router = (0, express_1.Router)();
 // user routes
 router.post("/login", userController.login);
 router.post("/signup", userController.signup);
+router.put("/update", auth_1.default, userController.update);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
 router.post("/", userController.getUserWithName);
