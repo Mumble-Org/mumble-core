@@ -5,12 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../middlewares/auth";
 import _ from "lodash";
-<<<<<<< HEAD
-import mongoose from "mongoose";
-import { getErrorMessage } from "../utils/errors.util";
-=======
 import { getSignedUrl } from "../utils/s3bucket.util";
->>>>>>> e8c54ed4cef5f8cefa49b76fc23efb9baf1d238a
 
 export async function register(user: HydratedDocument<I_UserDocument>) {
 	try {

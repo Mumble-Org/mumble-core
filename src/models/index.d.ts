@@ -21,6 +21,7 @@ export interface I_UserDocument {
 	total_plays: number;
 	saved_beats: Array<string>;
 	imageUrl: string;
+	reviews: Array<Types.ObjectId>;
 }
 
 /**
@@ -37,4 +38,12 @@ export interface I_BeatDocument {
 	license: string;
 	key: string;
 	plays: number;
+}
+
+
+export interface I_ReviewDocument {
+	text: string;
+	reviewer: Types.ObjectId;
+	user_id: Types.ObjectId;
+	rating: number;
 }

@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { I_UserDocument } from ".";
 
@@ -82,6 +82,12 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "beat",
+			},
+		],
+		reviews: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "review",
 			},
 		],
 	},

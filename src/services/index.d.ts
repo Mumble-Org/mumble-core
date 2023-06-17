@@ -9,3 +9,10 @@ export interface Beat {
 	__v?: number,
 	key: string,
 }
+
+export interface Review {
+	reviewText: string,
+	reviewerId: string,
+	userId: string,
+	rating: number,
+}
