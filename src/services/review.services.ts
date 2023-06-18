@@ -1,4 +1,5 @@
 import ReviewModel from "../models/review.model";
+import UserModel from "../models/user.model";
 import { Review as ReviewObject } from ".";
 
 /**
@@ -9,12 +10,21 @@ import { Review as ReviewObject } from ".";
 export async function create(reviewDetails: ReviewObject) {
   const { reviewText, reviewerId, userId, rating } = reviewDetails;
 
-  const review = ReviewModel.create({
-    text: reviewText,
-    reviewer: reviewerId,
-    user_id: userId,
-    rating
-  });
+  if (reviewerId != userId) {
+    const review = await ReviewModel.create({
+      text: reviewText,
+      reviewer: reviewerId,
+      user_id: userId,
+      rating
+    });
 
-  return review;
+    // update producer model
+		await UserModel.find({ _id: userId }).updateOne({
+			$push: { reviews: review._id },
+		});
+
+    return review;
+  }
+
+  throw new Error("You cannot review yourself!");
 }

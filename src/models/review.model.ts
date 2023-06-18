@@ -28,16 +28,6 @@ const ReviewSchema = new mongoose.Schema<I_ReviewDocument>(
   }
 );
 
-
-// mongoose middleware to confirm if a user isn't reviewing his/her self
-ReviewSchema.pre("save", async function (next) {
-  const review = this;
-  if (review.user_id == review.reviewer) {
-    throw new Error('You can not review yourself');
-  }
-  next();
-})
-
 // Create review model
 const ReviewModel = mongoose.model<I_ReviewDocument>('Review', ReviewSchema);
 

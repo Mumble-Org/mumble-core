@@ -28,6 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController = __importStar(require("../controllers/user.controller"));
+const reviewController = __importStar(require("../controllers/reviews.controller"));
 const auth_1 = __importDefault(require("../middlewares/auth"));
 const upload_middleware_1 = __importDefault(require("../middlewares/upload.middleware"));
 const router = (0, express_1.Router)();
@@ -38,6 +39,7 @@ router.put("/update", auth_1.default, userController.update);
 router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
 router.post("/", userController.getUserWithName);
+router.post("/review", auth_1.default, reviewController.createReview);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
 router.get("/profile", auth_1.default, userController.getProfileImage);

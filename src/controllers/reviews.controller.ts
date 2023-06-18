@@ -13,6 +13,9 @@ export const createReview = async (req: Request, res: Response) => {
 		const review = await reviewServices.create({reviewText, rating, reviewerId, userId })
 		res.status(201).json(review);
 	} catch (error) {
+		if (error instanceof Error && error.message == "You cannot review yourself!") {
+			return res.status(401).send(error.message);
+		}
     res.status(500).send("Internal Server Error");
     console.log(error);
   }
