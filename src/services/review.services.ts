@@ -28,3 +28,20 @@ export async function create(reviewDetails: ReviewObject) {
 
   throw new Error("You cannot review yourself!");
 }
+
+/**
+ * get - get review from database
+ * @param id 
+ * @returns 
+ */
+export async function get(id: string) {
+  try {
+    const review = await ReviewModel.findById(id);
+
+    if (!review) throw new Error("Review with the given ID does't exists.");
+
+    return review;
+  } catch (error) {
+    throw new Error("Review with the given ID doesn't exists.");
+  }
+}

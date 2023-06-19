@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createReview = void 0;
+exports.getReview = exports.createReview = void 0;
 const reviewServices = __importStar(require("../services/review.services"));
 /**
  * createReview - Create a new review
@@ -45,3 +45,24 @@ const createReview = async (req, res) => {
     }
 };
 exports.createReview = createReview;
+/**
+ * getReview - get review
+ * @param req
+ * @param res
+ * @returns
+ */
+const getReview = async (req, res) => {
+    try {
+        // Retrieve review id
+        const { id } = req.body;
+        const review = await reviewServices.get(id);
+        return res.status(200).json(review);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).send(error.message);
+        }
+        console.log(error);
+    }
+};
+exports.getReview = getReview;

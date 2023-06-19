@@ -14,6 +14,7 @@ router.post("/confirmUser", userController.confirmUsername);
 router.post("/confirmEmail", userController.confirmEmail);
 router.post("/", userController.getUserWithName);
 router.post("/review", auth, reviewController.createReview);
+router.get("/review", reviewController.getReview);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
 router.get("/profile", auth, userController.getProfileImage);
