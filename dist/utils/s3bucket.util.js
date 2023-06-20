@@ -115,7 +115,7 @@ exports.deleteFile = deleteFile;
 /**
  * Get temporary signed url to access bucket
  *
- * @params key `${user.id}-profile`
+ * @params key `image-${user.id}-profile`
  */
 const getSignedUrl = (key) => {
     const params = {

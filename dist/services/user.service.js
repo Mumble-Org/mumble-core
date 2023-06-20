@@ -156,10 +156,12 @@ async function getUser(username) {
             user.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${user._id.toString()}-profile`);
         }
         user.reviews.map(async (review) => {
-            // @ts-ignore
-            const imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`${review.reviewer._id}-profile`);
-            // @ts-ignore
-            review.reviewer.imageUrl = imageUrl;
+            if (review.reviewer.imageUrl) {
+                // @ts-ignore
+                const imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${review.reviewer._id}-profile`);
+                // @ts-ignore
+                review.reviewer.imageUrl = imageUrl;
+            }
         });
         return user;
     }
