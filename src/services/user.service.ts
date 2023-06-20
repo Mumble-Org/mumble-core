@@ -168,6 +168,13 @@ export async function getUser(username: string) {
 				`image-${user._id.toString()}-profile`
 			);
 		}
+
+		user.reviews.map(async (review) => {
+			// @ts-ignore
+			const imageUrl = await getSignedUrl(`${review.reviewer._id}-profile`);
+			// @ts-ignore
+			review.reviewer.imageUrl = imageUrl;
+		});
 		return user;
 	} catch (error) {
 		throw error;

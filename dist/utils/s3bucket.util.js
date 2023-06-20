@@ -114,6 +114,8 @@ const deleteFile = (beatUrl) => {
 exports.deleteFile = deleteFile;
 /**
  * Get temporary signed url to access bucket
+ *
+ * @params key `${user.id}-profile`
  */
 const getSignedUrl = (key) => {
     const params = {
