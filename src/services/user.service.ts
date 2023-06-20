@@ -171,7 +171,7 @@ export async function getUser(username: string) {
 
 		user.reviews.map(async (review) => {
 			// @ts-ignore
-			const imageUrl = await getSignedUrl(`${review.reviewer._id}-profile`);
+			const imageUrl = await getSignedUrl(`image-${review.reviewer._id}-profile`);
 			// @ts-ignore
 			review.reviewer.imageUrl = imageUrl;
 		});
