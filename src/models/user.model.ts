@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import { I_UserDocument } from ".";
+import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 /**
  * User model schema
@@ -81,13 +81,13 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 		saved_beats: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "beat",
+				ref: "Beat",
 			},
 		],
 		reviews: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "review",
+				ref: "Review",
 			},
 		],
 	},

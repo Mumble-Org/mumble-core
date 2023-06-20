@@ -1,11 +1,11 @@
 import { HydratedDocument } from "mongoose";
-import UserModel from "../models/user.model";
 import { I_UserDocument } from "../models/";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../middlewares/auth";
+import UserModel from "../models/user.model";
 import _ from "lodash";
+import bcrypt from "bcrypt";
 import { getSignedUrl } from "../utils/s3bucket.util";
+import jwt from "jsonwebtoken";
 
 /**
  * Create user
@@ -156,7 +156,9 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
  */
 export async function getUser(username: string) {
 	try {
-		const user = (await UserModel.findOne({ name: username }))?.toObject();
+		const user = (
+			await UserModel.findOne({ name: username }).populate("reviews")
+		)?.toObject();
 
 		if (user && user.imageUrl) {
 			user.imageUrl = await getSignedUrl(

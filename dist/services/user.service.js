@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.getUser = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.updateUser = exports.register = void 0;
-const user_model_1 = __importDefault(require("../models/user.model"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("../middlewares/auth");
+const user_model_1 = __importDefault(require("../models/user.model"));
 const lodash_1 = __importDefault(require("lodash"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const s3bucket_util_1 = require("../utils/s3bucket.util");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 /**
  * Create user
  * @param user
@@ -148,7 +148,7 @@ exports.checkEmail = checkEmail;
  */
 async function getUser(username) {
     try {
-        const user = (await user_model_1.default.findOne({ name: username }))?.toObject();
+        const user = (await user_model_1.default.findOne({ name: username }).populate("reviews"))?.toObject();
         if (user && user.imageUrl) {
             user.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${user._id.toString()}-profile`);
         }

@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const mongoose_1 = __importDefault(require("mongoose"));
 /**
  * User model schema
  */
@@ -83,13 +83,13 @@ const UserSchema = new mongoose_1.default.Schema({
     saved_beats: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "beat",
+            ref: "Beat",
         },
     ],
     reviews: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: "review",
+            ref: "Review",
         },
     ],
 }, { timestamps: true });
