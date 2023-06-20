@@ -157,7 +157,10 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
 export async function getUser(username: string) {
 	try {
 		const user = (
-			await UserModel.findOne({ name: username }).populate("reviews")
+			await UserModel.findOne({ name: username }).populate({
+				path: "reviews",
+				populate: { path: "reviewer" },
+			})
 		)?.toObject();
 
 		if (user && user.imageUrl) {

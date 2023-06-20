@@ -148,7 +148,10 @@ exports.checkEmail = checkEmail;
  */
 async function getUser(username) {
     try {
-        const user = (await user_model_1.default.findOne({ name: username }).populate("reviews"))?.toObject();
+        const user = (await user_model_1.default.findOne({ name: username }).populate({
+            path: "reviews",
+            populate: { path: "reviewer" },
+        }))?.toObject();
         if (user && user.imageUrl) {
             user.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${user._id.toString()}-profile`);
         }
