@@ -220,14 +220,14 @@ exports.uploadProfileImage = uploadProfileImage;
  */
 const getUserDetails = async (req, res) => {
     try {
-        const user = await user_model_1.default.findOne({ _id: req.body.id }).populate({
+        const user = (await user_model_1.default.findOne({ _id: req.body.id }).populate({
             path: "reviews",
             populate: { path: "reviewer" },
-        });
+        }))?.toObject();
         if (user) {
             if (user.imageUrl && user.imageUrl != "") {
                 const signedUrl = (0, s3bucket_util_1.getSignedUrl)(`image-${req.body.id}-profile`);
-                user.reviews.map(async (review) => {
+                await user.reviews.map(async (review) => {
                     if (review.reviewer.imageUrl) {
                         // @ts-ignore
                         const imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${review.reviewer._id}-profile`);

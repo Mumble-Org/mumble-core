@@ -203,16 +203,16 @@ export const uploadProfileImage = async (req: Request, res: Response) => {
  */
 export const getUserDetails = async (req: Request, res: Response) => {
 	try {
-		const user = await UserModel.findOne({ _id: req.body.id }).populate({
+		const user = (await UserModel.findOne({ _id: req.body.id }).populate({
 			path: "reviews",
 			populate: { path: "reviewer" },
-		});
+		}))?.toObject();
 
 		if (user) {
 			if (user.imageUrl && user.imageUrl != "") {
 				const signedUrl = getSignedUrl(`image-${req.body.id}-profile`);
 
-				user.reviews.map(async (review) => {
+				await user.reviews.map(async (review) => {
 					if (review.reviewer.imageUrl) {
 						// @ts-ignore
 						const imageUrl = await getSignedUrl(
@@ -222,6 +222,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
 						review.reviewer.imageUrl = imageUrl;
 					}
 				});
+
 				return res.status(200).json({ user, imageUrl: signedUrl });
 			} else {
 				return res.status(200).json({ user, imageUrl: null });
