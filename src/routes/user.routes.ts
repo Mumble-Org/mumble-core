@@ -1,6 +1,8 @@
-import { Router } from "express";
-import * as userController from "../controllers/user.controller";
 import * as reviewController from "../controllers/reviews.controller";
+import * as userController from "../controllers/user.controller";
+
+import { Request, Response, Router } from "express";
+
 import auth from "../middlewares/auth";
 import upload from "../middlewares/upload.middleware";
 
@@ -25,5 +27,8 @@ router.put(
 	userController.uploadProfileImage
 );
 router.delete("/savedBeat", auth, userController.RemoveSavedBeat);
+router.get("/verify", auth, (req: Request, res: Response) => {
+	return res.status(200).json({ success: true });
+});
 
 export default router;

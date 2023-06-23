@@ -26,9 +26,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const userController = __importStar(require("../controllers/user.controller"));
 const reviewController = __importStar(require("../controllers/reviews.controller"));
+const userController = __importStar(require("../controllers/user.controller"));
+const express_1 = require("express");
 const auth_1 = __importDefault(require("../middlewares/auth"));
 const upload_middleware_1 = __importDefault(require("../middlewares/upload.middleware"));
 const router = (0, express_1.Router)();
@@ -47,4 +47,7 @@ router.get("/profile", auth_1.default, userController.getProfileImage);
 router.put("/save", auth_1.default, userController.SavedBeats);
 router.put("/profileImage", [upload_middleware_1.default.single("image"), auth_1.default], userController.uploadProfileImage);
 router.delete("/savedBeat", auth_1.default, userController.RemoveSavedBeat);
+router.get("/verify", auth_1.default, (req, res) => {
+    return res.status(200).json({ success: true });
+});
 exports.default = router;
