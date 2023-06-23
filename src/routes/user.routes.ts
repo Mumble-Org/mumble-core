@@ -19,7 +19,7 @@ router.post("/review", auth, reviewController.createReview);
 router.get("/review", reviewController.getReview);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
-router.get("/profile", auth, userController.getProfileImage);
+router.get("/profile", auth, userController.getUserDetails);
 router.put("/save", auth, userController.SavedBeats);
 router.put(
 	"/profileImage",

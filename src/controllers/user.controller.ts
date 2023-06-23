@@ -1,9 +1,11 @@
-import { Request, Response } from "express";
-import { getErrorMessage } from "../utils/errors.util";
 // import upload from "../utils/s3bucket.utils";
 import * as userServices from "../services/user.service";
+
+import { Request, Response } from "express";
 import { getSignedUrl, uploadImage } from "../utils/s3bucket.util";
+
 import UserModel from "../models/user.model";
+import { getErrorMessage } from "../utils/errors.util";
 
 /**
  * Logs in a user
@@ -106,7 +108,10 @@ export const getTrendingProducers = async (req: Request, res: Response) => {
  * @param req
  * @param res
  */
-export const getTrendingSoundEngineers = async (req: Request, res: Response) => {
+export const getTrendingSoundEngineers = async (
+	req: Request,
+	res: Response
+) => {
 	try {
 		const page: number = parseInt(req.query?.page as string) || 1;
 		const limit: number = parseInt(req.query?.limit as string) || 24;
@@ -147,11 +152,10 @@ export const SavedBeats = async (req: Request, res: Response) => {
 	}
 };
 
-
 /**
  * Remove beat from user's list of saved beats
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  * @returns HTTP RESPONSE
  */
 export const RemoveSavedBeat = async (req: Request, res: Response) => {
@@ -163,9 +167,8 @@ export const RemoveSavedBeat = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.log(getErrorMessage(error));
 		res.status(500).send("Internal Server Error");
-
 	}
-}
+};
 
 /**
  * upload profile image and update url to image in the database
@@ -198,12 +201,27 @@ export const uploadProfileImage = async (req: Request, res: Response) => {
  * @param res
  * @returns HTTP response
  */
-export const getProfileImage = async (req: Request, res: Response) => {
+export const getUserDetails = async (req: Request, res: Response) => {
 	try {
-		const user = await UserModel.findOne({ _id: req.body.id });
+		const user = await UserModel.findOne({ _id: req.body.id }).populate({
+			path: "reviews",
+			populate: { path: "reviewer" },
+		});
+
 		if (user) {
 			if (user.imageUrl && user.imageUrl != "") {
 				const signedUrl = getSignedUrl(`image-${req.body.id}-profile`);
+
+				user.reviews.map(async (review) => {
+					if (review.reviewer.imageUrl) {
+						// @ts-ignore
+						const imageUrl = await getSignedUrl(
+							`image-${review.reviewer._id}-profile`
+						);
+						// @ts-ignore
+						review.reviewer.imageUrl = imageUrl;
+					}
+				});
 				return res.status(200).json({ user, imageUrl: signedUrl });
 			} else {
 				return res.status(200).json({ user, imageUrl: null });
@@ -216,7 +234,6 @@ export const getProfileImage = async (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	}
 };
-
 
 export const getUserWithName = async (req: Request, res: Response) => {
 	try {
@@ -231,4 +248,4 @@ export const getUserWithName = async (req: Request, res: Response) => {
 		console.log(getErrorMessage(error));
 		res.status(500).send("Internal Server Error");
 	}
-}
+};

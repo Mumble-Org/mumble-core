@@ -43,7 +43,7 @@ router.post("/review", auth_1.default, reviewController.createReview);
 router.get("/review", reviewController.getReview);
 router.get("/trendingProducers", userController.getTrendingProducers);
 router.get("/trendingEngineers", userController.getTrendingSoundEngineers);
-router.get("/profile", auth_1.default, userController.getProfileImage);
+router.get("/profile", auth_1.default, userController.getUserDetails);
 router.put("/save", auth_1.default, userController.SavedBeats);
 router.put("/profileImage", [upload_middleware_1.default.single("image"), auth_1.default], userController.uploadProfileImage);
 router.delete("/savedBeat", auth_1.default, userController.RemoveSavedBeat);

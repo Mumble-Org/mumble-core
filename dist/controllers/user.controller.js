@@ -26,12 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserWithName = exports.getProfileImage = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.update = exports.signup = exports.login = void 0;
-const errors_util_1 = require("../utils/errors.util");
+exports.getUserWithName = exports.getUserDetails = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.update = exports.signup = exports.login = void 0;
 // import upload from "../utils/s3bucket.utils";
 const userServices = __importStar(require("../services/user.service"));
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const user_model_1 = __importDefault(require("../models/user.model"));
+const errors_util_1 = require("../utils/errors.util");
 /**
  * Logs in a user
  */
@@ -218,12 +218,23 @@ exports.uploadProfileImage = uploadProfileImage;
  * @param res
  * @returns HTTP response
  */
-const getProfileImage = async (req, res) => {
+const getUserDetails = async (req, res) => {
     try {
-        const user = await user_model_1.default.findOne({ _id: req.body.id });
+        const user = await user_model_1.default.findOne({ _id: req.body.id }).populate({
+            path: "reviews",
+            populate: { path: "reviewer" },
+        });
         if (user) {
             if (user.imageUrl && user.imageUrl != "") {
                 const signedUrl = (0, s3bucket_util_1.getSignedUrl)(`image-${req.body.id}-profile`);
+                user.reviews.map(async (review) => {
+                    if (review.reviewer.imageUrl) {
+                        // @ts-ignore
+                        const imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${review.reviewer._id}-profile`);
+                        // @ts-ignore
+                        review.reviewer.imageUrl = imageUrl;
+                    }
+                });
                 return res.status(200).json({ user, imageUrl: signedUrl });
             }
             else {
@@ -239,7 +250,7 @@ const getProfileImage = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-exports.getProfileImage = getProfileImage;
+exports.getUserDetails = getUserDetails;
 const getUserWithName = async (req, res) => {
     try {
         const { name } = req.body;
