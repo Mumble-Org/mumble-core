@@ -22,6 +22,7 @@ export interface I_UserDocument {
 	saved_beats: Array<string>;
 	imageUrl: string;
 	reviews: Array<Types.ObjectId>;
+	rating: number;
 }
 
 /**

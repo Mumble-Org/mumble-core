@@ -179,6 +179,7 @@ export async function getUser(username: string) {
 				review.reviewer.imageUrl = imageUrl;
 			}
 		});
+
 		return user;
 	} catch (error) {
 		throw error;

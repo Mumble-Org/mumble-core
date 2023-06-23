@@ -90,6 +90,11 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 				ref: "Review",
 			},
 		],
+		rating: {
+			type: Number,
+			default: 0,
+			required: true,
+		}
 	},
 	{ timestamps: true }
 );

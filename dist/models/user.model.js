@@ -92,6 +92,11 @@ const UserSchema = new mongoose_1.default.Schema({
             ref: "Review",
         },
     ],
+    rating: {
+        type: Number,
+        default: 0,
+        required: true,
+    }
 }, { timestamps: true });
 // bcrypt salt rounds
 const saltRounds = 8;

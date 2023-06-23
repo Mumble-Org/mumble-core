@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get = exports.create = void 0;
+exports.get = exports.updateRating = exports.create = void 0;
 const review_model_1 = __importDefault(require("../models/review.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 /**
@@ -18,7 +18,7 @@ async function create(reviewDetails) {
             text: reviewText,
             reviewer: reviewerId,
             user_id: userId,
-            rating
+            rating,
         });
         // update producer model
         await user_model_1.default.find({ _id: userId }).updateOne({
@@ -29,6 +29,19 @@ async function create(reviewDetails) {
     throw new Error("You cannot review yourself!");
 }
 exports.create = create;
+/**
+ * Update producer's rating
+ * @param {String} id
+ */
+async function updateRating(id) {
+    const producer = await user_model_1.default.findById(id);
+    const reviews = await review_model_1.default.find({ user_id: id });
+    let sum = 0;
+    reviews.forEach((review) => (sum += review.rating));
+    producer.rating = sum / reviews.length;
+    await producer.save();
+}
+exports.updateRating = updateRating;
 /**
  * get - get review from database
  * @param id

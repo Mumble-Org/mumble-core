@@ -32,16 +32,18 @@ const reviewServices = __importStar(require("../services/review.services"));
  */
 const createReview = async (req, res) => {
     try {
-        const { reviewText, rating, reviewerId, userId } = req.body;
+        const { reviewText, rating, id, userId } = req.body;
+        const reviewerId = id;
         const review = await reviewServices.create({ reviewText, rating, reviewerId, userId });
-        res.status(201).json(review);
+        await reviewServices.updateRating(userId);
+        return res.status(201).json(review);
     }
     catch (error) {
         if (error instanceof Error && error.message == "You cannot review yourself!") {
             return res.status(401).send(error.message);
         }
-        res.status(500).send("Internal Server Error");
         console.log(error);
+        return res.status(500).send("Internal Server Error");
     }
 };
 exports.createReview = createReview;
@@ -59,10 +61,10 @@ const getReview = async (req, res) => {
         return res.status(200).json(review);
     }
     catch (error) {
-        if (error instanceof Error) {
-            res.status(500).send(error.message);
-        }
         console.log(error);
+        if (error instanceof Error) {
+            return res.status(500).send(error.message);
+        }
     }
 };
 exports.getReview = getReview;
