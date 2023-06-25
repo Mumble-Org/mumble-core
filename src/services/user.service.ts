@@ -52,8 +52,19 @@ export async function updateUser(body: HydratedDocument<I_UserDocument>) {
 
 	if (!user) throw new Error("User not found");
 
+	// if portfolio in request body, update portfolio
+	if (body.portfolio) {
+		await UserModel.updateOne({ _id: body.id }, {
+			$push: { porfolio: body.portfolio }
+		}).catch((error) => {
+			throw error;
+		});
+		body.portfolio = undefined;
+
+	}
 	// Update user
 	await UserModel.updateOne({ _id: body.id }, body);
+
 	user = await UserModel.findById(body.id);
 
 	return _.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);

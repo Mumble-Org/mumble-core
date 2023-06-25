@@ -50,6 +50,14 @@ async function updateUser(body) {
     let user = await user_model_1.default.findById(body.id);
     if (!user)
         throw new Error("User not found");
+    if (body.portfolio) {
+        await user_model_1.default.updateOne({ _id: body.id }, {
+            $push: { porfolio: body.portfolio }
+        }).catch((error) => {
+            throw error;
+        });
+        body.portfolio = undefined;
+    }
     // Update user
     await user_model_1.default.updateOne({ _id: body.id }, body);
     user = await user_model_1.default.findById(body.id);
