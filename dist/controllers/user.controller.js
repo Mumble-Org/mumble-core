@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserWithName = exports.getUserDetails = exports.uploadProfileImage = exports.RemoveSavedBeat = exports.SavedBeats = exports.getTrendingSoundEngineers = exports.getTrendingProducers = exports.confirmEmail = exports.confirmUsername = exports.update = exports.signup = exports.login = void 0;
 // import upload from "../utils/s3bucket.utils";
-const userServices = __importStar(require("../services/user.service"));
+const userServices = __importStar(require("../services/user.services"));
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const user_model_1 = __importDefault(require("../models/user.model"));
 const errors_util_1 = require("../utils/errors.util");

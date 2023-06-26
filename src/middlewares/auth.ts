@@ -1,5 +1,5 @@
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 
 export const SECRET_KEY: Secret = 'testkey' || process.env.MUMBLE_SECRET_KEY;
 

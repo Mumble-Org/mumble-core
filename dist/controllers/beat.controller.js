@@ -26,13 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBeatsByUserid = exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
-const errors_util_1 = require("../utils/errors.util");
+exports.unsaveBeat = exports.saveBeat = exports.getBeatsByUserid = exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
+const beatServices = __importStar(require("../services/beat.services"));
+const userServices = __importStar(require("../services/user.services"));
 const s3bucket_util_1 = require("../utils/s3bucket.util");
 const beat_model_1 = __importDefault(require("../models/beat.model"));
-const lodash_1 = __importDefault(require("lodash"));
-const beatServices = __importStar(require("../services/beat.services"));
 const user_model_1 = __importDefault(require("../models/user.model"));
+const lodash_1 = __importDefault(require("lodash"));
+const errors_util_1 = require("../utils/errors.util");
 /**
  * Define upload route's controller
  * @param req
@@ -307,3 +308,43 @@ const getBeatsByUserid = async (req, res) => {
     }
 };
 exports.getBeatsByUserid = getBeatsByUserid;
+/**
+ * Save beat to user's document
+ * @param req
+ * @param res
+ */
+const saveBeat = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const { beat_id } = req.query;
+        const user = await userServices.getUserById(id);
+        user.saved_beats.push(beat_id);
+        await user.save();
+        return res.status(200).json({ message: "Beat saved!" });
+    }
+    catch (err) {
+        console.log((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal server error!");
+    }
+};
+exports.saveBeat = saveBeat;
+/**
+ * Unsave beat from user's document
+ * @param req
+ * @param res
+ */
+const unsaveBeat = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const { beat_id } = req.query;
+        const user = await userServices.getUserById(id);
+        user.saved_beats.pull(beat_id);
+        await user.save();
+        return res.status(200).json({ message: "Beat unsaved!" });
+    }
+    catch (err) {
+        console.log((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal server error!");
+    }
+};
+exports.unsaveBeat = unsaveBeat;

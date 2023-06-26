@@ -1,17 +1,20 @@
+import * as beatServices from "../services/beat.services";
+import * as userServices from "../services/user.services";
+
 import { Request, Response } from "express";
-import { getErrorMessage } from "../utils/errors.util";
 import {
 	deleteFile,
 	getSignedUrl,
 	uploadAudio,
-	uploadImage,
 	uploadData,
+	uploadImage,
 } from "../utils/s3bucket.util";
+
 import BeatModel from "../models/beat.model";
+import UserModel from "../models/user.model";
 import _ from "lodash";
 import { fileRequest } from ".";
-import * as beatServices from "../services/beat.services";
-import UserModel from "../models/user.model";
+import { getErrorMessage } from "../utils/errors.util";
 
 /**
  * Define upload route's controller
@@ -305,3 +308,45 @@ export const getBeatsByUserid = async (req: Request, res: Response) => {
 		res.status(500).send("Internal server error!");
 	}
 };
+
+/**
+ * Save beat to user's document
+ * @param req 
+ * @param res 
+ */
+export const saveBeat = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+		const { beat_id } = req.query;
+	
+		const user = await userServices.getUserById(id);
+		user.saved_beats.push(beat_id as string);
+		await user.save();
+	
+		return res.status(200).json({message: "Beat saved!"});
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+}
+
+/**
+ * Unsave beat from user's document
+ * @param req 
+ * @param res 
+ */
+export const unsaveBeat = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+		const { beat_id } = req.query;
+	
+		const user = await userServices.getUserById(id);
+		user.saved_beats.pull(beat_id);
+		await user.save();
+	
+		return res.status(200).json({message: "Beat unsaved!"});
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+}
