@@ -370,7 +370,14 @@ export const getSavedBeats = async (req: Request, res: Response) => {
 		const user = await userServices.getUserById(id);
 		await user.populate("saved_beats");
 
-		return res.status(200).json(user.saved_beats);
+		const promises = [];
+		for (const beat of user.saved_beats) {
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
+		}
+
+		const result = await Promise.all(promises);
+
+		return res.status(200).json(result);
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal server error!");
