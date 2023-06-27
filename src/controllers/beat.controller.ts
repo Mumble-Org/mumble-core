@@ -368,6 +368,7 @@ export const getSavedBeats = async (req: Request, res: Response) => {
 		const { id } = req.body;
 
 		const user = await userServices.getUserById(id);
+		await user.populate("saved_beats");
 
 		return res.status(200).json(user.saved_beats);
 	} catch (err) {
