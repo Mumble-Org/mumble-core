@@ -191,7 +191,9 @@ export const getTrendingBeats = async (req: Request, res: Response) => {
 		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
 		// Get beats created in the last month and sort by plays
-		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneMonthAgo))
+		const beats = await BeatModel.find(
+			beatServices.getFindObject(genre as string, oneMonthAgo)
+		)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort(beatServices.getSortOrder(price as string))
@@ -231,7 +233,9 @@ export const getPopularBeats = async (req: Request, res: Response) => {
 		const oneYearAgo = new Date();
 		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 		// Get beats created in the last year and sort by plays
-		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneYearAgo))
+		const beats = await BeatModel.find(
+			beatServices.getFindObject(genre as string, oneYearAgo)
+		)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort(beatServices.getSortOrder(price as string))
@@ -283,9 +287,9 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 
 /**
  * Get beats produced by a user
- * @param req 
- * @param res 
- * @returns 
+ * @param req
+ * @param res
+ * @returns
  */
 export const getBeatsByUserid = async (req: Request, res: Response) => {
 	try {
@@ -311,42 +315,63 @@ export const getBeatsByUserid = async (req: Request, res: Response) => {
 
 /**
  * Save beat to user's document
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 export const saveBeat = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.body;
 		const { beat_id } = req.query;
-	
+
 		const user = await userServices.getUserById(id);
-		user.saved_beats.push(beat_id as string);
-		await user.save();
-	
-		return res.status(200).json({message: "Beat saved!"});
+		if (!user.saved_beats.includes(beat_id as string)) {
+			user.saved_beats.push(beat_id as string);
+			await user.save();
+		}
+
+		return res.status(200).json({ message: "Beat saved!" });
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal server error!");
 	}
-}
+};
 
 /**
  * Unsave beat from user's document
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 export const unsaveBeat = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.body;
 		const { beat_id } = req.query;
-	
+
 		const user = await userServices.getUserById(id);
 		user.saved_beats.pull(beat_id);
 		await user.save();
-	
-		return res.status(200).json({message: "Beat unsaved!"});
+
+		return res.status(200).json({ message: "Beat unsaved!" });
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal server error!");
 	}
-}
+};
+
+/**
+ * Get saved_beats for a user
+ * @param req
+ * @param res
+ * @returns
+ */
+export const getSavedBeats = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+
+		const user = await userServices.getUserById(id);
+
+		return res.status(200).json(user.saved_beats);
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+};

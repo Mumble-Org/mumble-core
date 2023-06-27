@@ -4,6 +4,7 @@ import {
 	getBeatsById,
 	getBeatsByUserid,
 	getPopularBeats,
+	getSavedBeats,
 	getTrendingBeats,
 	saveBeat,
 	unsaveBeat,
@@ -52,6 +53,7 @@ router.delete("", auth, deleteBeat);
 router.put("/plays", updateBeatPlays);
 router.put("/save", auth, saveBeat);
 router.put("/unsave", auth, unsaveBeat);
+router.get("/saved", auth, getSavedBeats);
 router.get("/:id", auth, getBeatsById);
 
 

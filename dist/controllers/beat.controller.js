@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsaveBeat = exports.saveBeat = exports.getBeatsByUserid = exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
+exports.getSavedBeats = exports.unsaveBeat = exports.saveBeat = exports.getBeatsByUserid = exports.updateBeatPlays = exports.getPopularBeats = exports.getTrendingBeats = exports.deleteBeat = exports.getBeats = exports.getBeatsById = exports.uploadBeat = void 0;
 const beatServices = __importStar(require("../services/beat.services"));
 const userServices = __importStar(require("../services/user.services"));
 const s3bucket_util_1 = require("../utils/s3bucket.util");
@@ -318,8 +318,10 @@ const saveBeat = async (req, res) => {
         const { id } = req.body;
         const { beat_id } = req.query;
         const user = await userServices.getUserById(id);
-        user.saved_beats.push(beat_id);
-        await user.save();
+        if (!user.saved_beats.includes(beat_id)) {
+            user.saved_beats.push(beat_id);
+            await user.save();
+        }
         return res.status(200).json({ message: "Beat saved!" });
     }
     catch (err) {
@@ -348,3 +350,21 @@ const unsaveBeat = async (req, res) => {
     }
 };
 exports.unsaveBeat = unsaveBeat;
+/**
+ * Get saved_beats for a user
+ * @param req
+ * @param res
+ * @returns
+ */
+const getSavedBeats = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const user = await userServices.getUserById(id);
+        return res.status(200).json(user.saved_beats);
+    }
+    catch (err) {
+        console.log((0, errors_util_1.getErrorMessage)(err));
+        res.status(500).send("Internal server error!");
+    }
+};
+exports.getSavedBeats = getSavedBeats;
