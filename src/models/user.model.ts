@@ -41,7 +41,12 @@ const UserSchema = new mongoose.Schema<I_UserDocument>(
 		},
 		portfolio: [
 			{
-				type: String,
+				title: {
+					type: String,
+				},
+				link: {
+					type: String,
+				},
 			},
 		],
 		type: {
