@@ -98,18 +98,9 @@ const getBeatsById = async (req, res) => {
         if (!audio) {
             return res.status(404).send("Audio not found");
         }
-        // get audio from s3 bucket
-        const audioKey = `audio-${audio.key}`;
-        const imageKey = `image-${audio.key}`;
-        const dataKey = `data-${audio.key}`;
-        const audioSignedUrl = (0, s3bucket_util_1.getSignedUrl)(audioKey);
-        const imageSignedUrl = (0, s3bucket_util_1.getSignedUrl)(imageKey);
-        const dataSignedUrl = (0, s3bucket_util_1.getSignedUrl)(dataKey);
-        const audioR = lodash_1.default.omit(audio.toObject(), ["__v"]);
+        const audioR = await beatServices.getBeatDetails(audio.toObject());
         // Return audio file URL on s3
-        res
-            .status(200)
-            .json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
+        return res.status(200).json(audioR);
     }
     catch (err) {
         console.log((0, errors_util_1.getErrorMessage)(err));

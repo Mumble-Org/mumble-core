@@ -85,21 +85,10 @@ export const getBeatsById = async (req: Request, res: Response) => {
 			return res.status(404).send("Audio not found");
 		}
 
-		// get audio from s3 bucket
-		const audioKey = `audio-${audio.key}`;
-		const imageKey = `image-${audio.key}`;
-		const dataKey = `data-${audio.key}`;
-
-		const audioSignedUrl = getSignedUrl(audioKey);
-		const imageSignedUrl = getSignedUrl(imageKey);
-		const dataSignedUrl = getSignedUrl(dataKey);
-
-		const audioR = _.omit(audio.toObject(), ["__v"]);
+		const audioR = await beatServices.getBeatDetails(audio.toObject())
 
 		// Return audio file URL on s3
-		res
-			.status(200)
-			.json({ audioR, audioSignedUrl, imageSignedUrl, dataSignedUrl });
+		return res.status(200).json(audioR);
 	} catch (err) {
 		console.log(getErrorMessage(err));
 		res.status(500).send("Internal Server Error");
