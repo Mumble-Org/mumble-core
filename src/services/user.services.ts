@@ -1,5 +1,5 @@
 import { HydratedDocument } from "mongoose";
-import { I_UserDocument } from "../models/";
+import { I_UserDocument } from "../models";
 import { SECRET_KEY } from "../middlewares/auth";
 import UserModel from "../models/user.model";
 import _ from "lodash";
@@ -319,6 +319,19 @@ export async function removeSavedBeat(beat_id: string, user_id: string) {
 		user.save();
 
 		return { user: _.omit(user.toObject(), ["__v", "password"]) };
+	} catch (error) {
+		throw error;
+	}
+}
+
+/**
+ * Get user by id
+ * @param id User id
+ * @returns user object
+ */
+export async function getUserById(id: string) {
+	try {
+		return await UserModel.findById(id);
 	} catch (error) {
 		throw error;
 	}

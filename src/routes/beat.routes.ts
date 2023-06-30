@@ -1,15 +1,19 @@
-import { Router } from "express";
-import auth from "../middlewares/auth";
 import {
-	uploadBeat,
-	getBeatsById,
 	deleteBeat,
 	getBeats,
-	getTrendingBeats,
-	getPopularBeats,
-	updateBeatPlays,
+	getBeatsById,
 	getBeatsByUserid,
+	getPopularBeats,
+	getSavedBeats,
+	getTrendingBeats,
+	saveBeat,
+	unsaveBeat,
+	updateBeatPlays,
+	uploadBeat,
 } from "../controllers/beat.controller";
+
+import { Router } from "express";
+import auth from "../middlewares/auth";
 import upload from "../middlewares/upload.middleware";
 
 /**
@@ -45,8 +49,12 @@ router.get("/trending", getTrendingBeats);
 router.get("/popular", getPopularBeats);
 router.get("", getBeats);
 router.get("/getuserbeats/", getBeatsByUserid);
-router.get("/:id", auth, getBeatsById);
 router.delete("", auth, deleteBeat);
 router.put("/plays", updateBeatPlays);
+router.put("/save", auth, saveBeat);
+router.put("/unsave", auth, unsaveBeat);
+router.get("/saved", auth, getSavedBeats);
+router.get("/:id", auth, getBeatsById);
+
 
 export default router;

@@ -1,17 +1,20 @@
+import * as beatServices from "../services/beat.services";
+import * as userServices from "../services/user.services";
+
 import { Request, Response } from "express";
-import { getErrorMessage } from "../utils/errors.util";
 import {
 	deleteFile,
 	getSignedUrl,
 	uploadAudio,
-	uploadImage,
 	uploadData,
+	uploadImage,
 } from "../utils/s3bucket.util";
+
 import BeatModel from "../models/beat.model";
+import UserModel from "../models/user.model";
 import _ from "lodash";
 import { fileRequest } from ".";
-import * as beatServices from "../services/beat.services";
-import UserModel from "../models/user.model";
+import { getErrorMessage } from "../utils/errors.util";
 
 /**
  * Define upload route's controller
@@ -188,7 +191,9 @@ export const getTrendingBeats = async (req: Request, res: Response) => {
 		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
 		// Get beats created in the last month and sort by plays
-		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneMonthAgo))
+		const beats = await BeatModel.find(
+			beatServices.getFindObject(genre as string, oneMonthAgo)
+		)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort(beatServices.getSortOrder(price as string))
@@ -228,7 +233,9 @@ export const getPopularBeats = async (req: Request, res: Response) => {
 		const oneYearAgo = new Date();
 		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 		// Get beats created in the last year and sort by plays
-		const beats = await BeatModel.find(beatServices.getFindObject(genre as string, oneYearAgo))
+		const beats = await BeatModel.find(
+			beatServices.getFindObject(genre as string, oneYearAgo)
+		)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort(beatServices.getSortOrder(price as string))
@@ -280,9 +287,9 @@ export const updateBeatPlays = async (req: Request, res: Response) => {
 
 /**
  * Get beats produced by a user
- * @param req 
- * @param res 
- * @returns 
+ * @param req
+ * @param res
+ * @returns
  */
 export const getBeatsByUserid = async (req: Request, res: Response) => {
 	try {
@@ -294,6 +301,77 @@ export const getBeatsByUserid = async (req: Request, res: Response) => {
 
 		const promises = [];
 		for (const beat of beats) {
+			promises.push(beatServices.getBeatDetails(beat.toObject()));
+		}
+
+		const result = await Promise.all(promises);
+
+		return res.status(200).json(result);
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+};
+
+/**
+ * Save beat to user's document
+ * @param req
+ * @param res
+ */
+export const saveBeat = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+		const { beat_id } = req.query;
+
+		const user = await userServices.getUserById(id);
+		if (!user.saved_beats.includes(beat_id as string)) {
+			user.saved_beats.push(beat_id as string);
+			await user.save();
+		}
+
+		return res.status(200).json({ message: "Beat saved!" });
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+};
+
+/**
+ * Unsave beat from user's document
+ * @param req
+ * @param res
+ */
+export const unsaveBeat = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+		const { beat_id } = req.query;
+
+		const user = await userServices.getUserById(id);
+		user.saved_beats.pull(beat_id);
+		await user.save();
+
+		return res.status(200).json({ message: "Beat unsaved!" });
+	} catch (err) {
+		console.log(getErrorMessage(err));
+		res.status(500).send("Internal server error!");
+	}
+};
+
+/**
+ * Get saved_beats for a user
+ * @param req
+ * @param res
+ * @returns
+ */
+export const getSavedBeats = async (req: Request, res: Response) => {
+	try {
+		const { id } = req.body;
+
+		const user = await userServices.getUserById(id);
+		await user.populate("saved_beats");
+
+		const promises = [];
+		for (const beat of user.saved_beats) {
 			promises.push(beatServices.getBeatDetails(beat.toObject()));
 		}
 

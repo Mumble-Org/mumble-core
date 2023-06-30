@@ -1,5 +1,5 @@
 // import upload from "../utils/s3bucket.utils";
-import * as userServices from "../services/user.service";
+import * as userServices from "../services/user.services";
 
 import { Request, Response } from "express";
 import { getSignedUrl, uploadImage } from "../utils/s3bucket.util";
