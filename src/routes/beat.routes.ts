@@ -54,7 +54,7 @@ router.put("/plays", updateBeatPlays);
 router.put("/save", auth, saveBeat);
 router.put("/unsave", auth, unsaveBeat);
 router.get("/saved", auth, getSavedBeats);
-router.get("/:id", auth, getBeatsById);
+router.get("/:id", getBeatsById);
 
 
 export default router;
