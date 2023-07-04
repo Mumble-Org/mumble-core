@@ -54,25 +54,17 @@ export async function updateUser(body: HydratedDocument<I_UserDocument>) {
 		if (!user) throw new Error("User not found");
 
 		// Input validation
-			if (!body.portfolio || !Array.isArray(body.portfolio)) {
-				throw new Error("Invalid portfolio data");
-			}
+		if (!body.portfolio || !Array.isArray(body.portfolio)) {
+			throw new Error("Invalid portfolio data");
+		}
 
-		const existingPortfolio = user.portfolio;
-
-		// Filter out existing portfolio items that already exist in the incoming portfolio
-		const newPortfolioItems = body.portfolio.filter(
-			(item) => !existingPortfolio.some((existingItem) => existingItem === item)
-		);
 
 		// Push the new portfolio items to the user's portfolio
-		if (newPortfolioItems.length > 0) {
-			await UserModel.updateOne({ _id: body.id }, {
-				$push: { portfolio: { $each: newPortfolioItems } },
-			}).catch((error) => {
-				throw error;
-			});
-		}
+		await UserModel.updateOne({ _id: body.id }, {
+			$set: { portfolio: body.portfolio },
+		}).catch((error) => {
+			throw error;
+		});
 
 		body.portfolio = undefined;
 
