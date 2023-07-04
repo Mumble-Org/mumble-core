@@ -1,9 +1,10 @@
-import { Types } from "mongoose";
+import { Types, ObjectId } from "mongoose";
 
 /**
  * User model interface
  */
 export interface I_UserDocument {
+	_id: Types.ObjectId;
 	name: string;
 	password: string;
 	calendar?: string;
@@ -42,9 +43,21 @@ export interface I_BeatDocument {
 }
 
 
-export interface I_ReviewDocument {
-	text: string;
-	reviewer: Types.ObjectId;
-	user_id: Types.ObjectId;
-	rating: number;
+interface I_ReviewDocument extends Document {
+  text: string;
+  reviewer: Types.ObjectId;
+  user_id: Types.ObjectId;
+  rating: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+interface I_PopulatedReviewDocument extends ObjectId {
+  text: string;
+  reviewer?: I_UserDocument;
+  user_id: Types.ObjectId;
+  rating: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

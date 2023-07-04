@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserById = exports.removeSavedBeat = exports.saveBeat = exports.getEngineers = exports.getProducers = exports.getUser = exports.checkEmail = exports.checkName = exports.login = exports.parseUser = exports.updateUser = exports.register = void 0;
-const auth_1 = require("../middlewares/auth");
-const user_model_1 = __importDefault(require("../models/user.model"));
 const lodash_1 = __importDefault(require("lodash"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const s3bucket_util_1 = require("../utils/s3bucket.util");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const user_model_1 = __importDefault(require("../models/user.model"));
+const auth_1 = require("../middlewares/auth");
+const s3bucket_util_1 = require("../utils/s3bucket.util");
 /**
  * Create user
  * @param user
@@ -46,23 +46,39 @@ exports.register = register;
  * @param body
  */
 async function updateUser(body) {
-    // Get user
-    let user = await user_model_1.default.findById(body.id);
-    if (!user)
-        throw new Error("User not found");
-    // if portfolio in request body, update portfolio
-    if (body.portfolio) {
-        await user_model_1.default.updateOne({ _id: body.id }, {
-            $push: { porfolio: body.portfolio }
-        }).catch((error) => {
-            throw error;
-        });
+    try {
+        // Get user
+        let user = await user_model_1.default.findById(body.id);
+        if (!user)
+            throw new Error("User not found");
+        // Input validation
+        if (!body.portfolio || !Array.isArray(body.portfolio)) {
+            throw new Error("Invalid portfolio data");
+        }
+        const existingPortfolio = user.portfolio;
+        // Filter out existing portfolio items that already exist in the incoming portfolio
+        const newPortfolioItems = body.portfolio.filter((item) => !existingPortfolio.some((existingItem) => existingItem === item));
+        // Push the new portfolio items to the user's portfolio
+        if (newPortfolioItems.length > 0) {
+            await user_model_1.default.updateOne({ _id: body.id }, {
+                $push: { portfolio: { $each: newPortfolioItems } },
+            }).catch((error) => {
+                throw error;
+            });
+        }
         body.portfolio = undefined;
+        // Update user
+        await user_model_1.default.updateOne({ _id: body.id }, body);
+        user = await user_model_1.default.findById(body.id);
+        if (!user) {
+            throw new Error("Failed to retrieve updated user");
+        }
+        return lodash_1.default.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
     }
-    // Update user
-    await user_model_1.default.updateOne({ _id: body.id }, body);
-    user = await user_model_1.default.findById(body.id);
-    return lodash_1.default.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
+    catch (error) {
+        if (error instanceof Error)
+            throw new Error(`Failed to Update user: ${error.message}`);
+    }
 }
 exports.updateUser = updateUser;
 /**
@@ -157,22 +173,28 @@ exports.checkEmail = checkEmail;
  */
 async function getUser(username) {
     try {
-        const user = (await user_model_1.default.findOne({ name: username }).populate({
+        const user = await user_model_1.default.findOne({ name: username }).populate({
             path: "reviews",
             populate: { path: "reviewer" },
-        }))?.toObject();
-        if (user && user.imageUrl) {
-            user.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${user._id.toString()}-profile`);
+        })
+            .exec();
+        if (!user) {
+            throw new Error('Could not retrieve user');
         }
-        user.reviews.map(async (review) => {
+        const userObj = user.toObject();
+        if (userObj && userObj.imageUrl) {
+            userObj.imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${userObj._id.toString()}-profile`);
+        }
+        // Iterate over 'reviews' array using a regular 'for' loop
+        for (let i = 0; i < user.reviews.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const review = userObj.reviews[i];
             if (review.reviewer.imageUrl) {
-                // @ts-ignore
                 const imageUrl = await (0, s3bucket_util_1.getSignedUrl)(`image-${review.reviewer._id}-profile`);
-                // @ts-ignore
                 review.reviewer.imageUrl = imageUrl;
             }
-        });
-        return user;
+        }
+        return userObj;
     }
     catch (error) {
         throw error;

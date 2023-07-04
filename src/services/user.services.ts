@@ -1,11 +1,11 @@
-import { HydratedDocument } from "mongoose";
-import { I_UserDocument } from "../models";
-import { SECRET_KEY } from "../middlewares/auth";
-import UserModel from "../models/user.model";
 import _ from "lodash";
 import bcrypt from "bcrypt";
-import { getSignedUrl } from "../utils/s3bucket.util";
 import jwt from "jsonwebtoken";
+import { HydratedDocument } from "mongoose";
+import UserModel from "../models/user.model";
+import { SECRET_KEY } from "../middlewares/auth";
+import { getSignedUrl } from "../utils/s3bucket.util";
+import { I_UserDocument } from "../models";
 
 /**
  * Create user
@@ -47,27 +47,49 @@ export async function register(user: HydratedDocument<I_UserDocument>) {
  * @param body
  */
 export async function updateUser(body: HydratedDocument<I_UserDocument>) {
-	// Get user
-	let user = await UserModel.findById(body.id);
+	try {
+		// Get user
+		let user = await UserModel.findById(body.id);
 
-	if (!user) throw new Error("User not found");
+		if (!user) throw new Error("User not found");
 
-	// if portfolio in request body, update portfolio
-	if (body.portfolio) {
-		await UserModel.updateOne({ _id: body.id }, {
-			$push: { porfolio: body.portfolio }
-		}).catch((error) => {
-			throw error;
-		});
+		// Input validation
+			if (!body.portfolio || !Array.isArray(body.portfolio)) {
+				throw new Error("Invalid portfolio data");
+			}
+
+		const existingPortfolio = user.portfolio;
+
+		// Filter out existing portfolio items that already exist in the incoming portfolio
+		const newPortfolioItems = body.portfolio.filter(
+			(item) => !existingPortfolio.some((existingItem) => existingItem === item)
+		);
+
+		// Push the new portfolio items to the user's portfolio
+		if (newPortfolioItems.length > 0) {
+			await UserModel.updateOne({ _id: body.id }, {
+				$push: { portfolio: { $each: newPortfolioItems } },
+			}).catch((error) => {
+				throw error;
+			});
+		}
+
 		body.portfolio = undefined;
 
+		// Update user
+		await UserModel.updateOne({ _id: body.id }, body);
+
+		user = await UserModel.findById(body.id);
+
+		if (!user) {
+      throw new Error("Failed to retrieve updated user");
+    }
+
+		return _.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
+
+	} catch (error) {
+		if (error instanceof Error) throw new Error(`Failed to Update user: ${error.message}`);
 	}
-	// Update user
-	await UserModel.updateOne({ _id: body.id }, body);
-
-	user = await UserModel.findById(body.id);
-
-	return _.omit(user.toObject(), ["createdAt", "updatedAt", "__v", "password"]);
 }
 
 /**
@@ -167,35 +189,43 @@ export async function checkEmail(user: HydratedDocument<I_UserDocument>) {
  */
 export async function getUser(username: string) {
 	try {
-		const user = (
-			await UserModel.findOne({ name: username }).populate({
+		const user = await UserModel.findOne({ name: username }).populate({
 				path: "reviews",
 				populate: { path: "reviewer" },
-			})
-		)?.toObject();
+		})
+		.exec();
+		
+		if (!user) {
+			throw new Error('Could not retrieve user');
+		}
 
-		if (user && user.imageUrl) {
-			user.imageUrl = await getSignedUrl(
-				`image-${user._id.toString()}-profile`
+		const userObj = user.toObject();
+
+		if (userObj && userObj.imageUrl) {
+			userObj.imageUrl = await getSignedUrl(
+				`image-${userObj._id.toString()}-profile`
 			);
 		}
 
-		user.reviews.map(async (review) => {
+		// Iterate over 'reviews' array using a regular 'for' loop
+		for (let i = 0; i < user.reviews.length; i++) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const review: any = userObj.reviews[i];
+
 			if (review.reviewer.imageUrl) {
-				// @ts-ignore
 				const imageUrl = await getSignedUrl(
 					`image-${review.reviewer._id}-profile`
 				);
-				// @ts-ignore
 				review.reviewer.imageUrl = imageUrl;
 			}
-		});
+		}
 
-		return user;
+		return userObj;
 	} catch (error) {
 		throw error;
 	}
 }
+
 /**
  * get trending producers from the database
  * @param page

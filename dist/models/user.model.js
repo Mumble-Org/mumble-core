@@ -43,7 +43,12 @@ const UserSchema = new mongoose_1.default.Schema({
     },
     portfolio: [
         {
-            type: String,
+            title: {
+                type: String,
+            },
+            link: {
+                type: String,
+            },
         },
     ],
     type: {
@@ -74,7 +79,6 @@ const UserSchema = new mongoose_1.default.Schema({
     rate: {
         type: Number,
         default: 0,
-        required: true,
     },
     total_plays: {
         type: Number,
