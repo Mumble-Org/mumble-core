@@ -40,5 +40,5 @@ router.put("/plays", beat_controller_1.updateBeatPlays);
 router.put("/save", auth_1.default, beat_controller_1.saveBeat);
 router.put("/unsave", auth_1.default, beat_controller_1.unsaveBeat);
 router.get("/saved", auth_1.default, beat_controller_1.getSavedBeats);
-router.get("/:id", auth_1.default, beat_controller_1.getBeatsById);
+router.get("/:id", beat_controller_1.getBeatsById);
 exports.default = router;
